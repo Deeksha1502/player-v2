@@ -526,6 +526,13 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setCurrentQuestion(0);
     beginAssessmentTimer();
     setHasStarted(true);
+    // Same START telemetry as handleStart/handleSectionSelectFromOverview —
+    // this effect is a THIRD path into the assessment (showStartPage:'No')
+    // that bypasses both, so it needs its own copy of the same one-shot guard.
+    if (telemetryStartRef.current == null) {
+      telemetryStartRef.current = Date.now();
+      logAssessmentStart(Date.now() - playerMountedAtRef.current);
+    }
     setStage('assessment');
     // Guarded by the ref; the setters/timer are stable enough here.
     // eslint-disable-next-line react-hooks/exhaustive-deps

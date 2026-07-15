@@ -104,6 +104,30 @@ describe('telemetry-service — CS SDK integration', () => {
     expect(init).toHaveBeenCalledTimes(1);
   });
 
+  it('regression: does not start a second concurrent init() before the first resolves (React StrictMode double-invoke)', async () => {
+    // isInitialised only flips true once init() RESOLVES, not when it's
+    // called — model that explicitly here (the other tests' mock flips it
+    // synchronously, which would mask this exact race).
+    isInitialised = false;
+    let resolveInit: () => void;
+    init.mockImplementationOnce(
+      () => new Promise<void>((resolve) => {
+        resolveInit = () => {
+          isInitialised = true;
+          resolve();
+        };
+      }),
+    );
+
+    initializeTelemetry(fullContext as any); // 1st call: starts init(), still pending
+    initializeTelemetry(fullContext as any); // 2nd call (e.g. StrictMode remount): must NOT start a 2nd init()
+
+    expect(init).toHaveBeenCalledTimes(1);
+    resolveInit!();
+    await new Promise((r) => setTimeout(r, 0));
+    expect(initTelemetry).toHaveBeenCalledTimes(1);
+  });
+
   it('regression: omits apislug entirely when the host does not provide one, so the SDK\'s own "/action" default applies', async () => {
     // The portal's telemetryContextBuilder.ts never sets context.apislug (nor
     // does Angular's quml-library.service.ts) — both rely on the legacy

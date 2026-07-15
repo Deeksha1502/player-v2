@@ -76,6 +76,16 @@ let eventQueue: TelemetryEvent[] = [];
  */
 let csEventOptions: { object: unknown; context: unknown } | null = null;
 
+/**
+ * Guards against concurrent `CsTelemetryModule.instance.init({})` calls —
+ * `isInitialised` only flips true once `.init()` RESOLVES, so two
+ * `initializeTelemetry` calls in the same tick (React 18 StrictMode
+ * double-invokes effects in dev; a host could also call init twice) would
+ * otherwise both see `isInitialised === false` and both start `.init({})`.
+ * Reset on failure so a later call can still retry.
+ */
+let csSdkInitInFlight = false;
+
 function isEmptyContext(context: TelemetryContext | null | undefined): boolean {
   return !context || Object.keys(context).length === 0;
 }
@@ -115,7 +125,10 @@ function initializeCsSdk(context: TelemetryContext): void {
   loadLegacyTelemetrySdk();
   const contentSessionId = generateID();
   const playSessionId = generateID();
-  const cdata = ((context.cdata as unknown[]) || []).concat([
+  // TelemetryContext's index signature allows any type for unknown keys — a
+  // truthy non-array (e.g. a host accidentally passing an object/string)
+  // would throw on .concat() or produce an invalid cdata, so gate explicitly.
+  const cdata = (Array.isArray(context.cdata) ? context.cdata : []).concat([
     { id: contentSessionId, type: 'ContentSession' },
     { id: playSessionId, type: 'PlaySession' },
     { id: '2.0', type: 'PlayerVersion' },
@@ -145,7 +158,8 @@ function initializeCsSdk(context: TelemetryContext): void {
     },
   };
 
-  if (!CsTelemetryModule.instance.isInitialised) {
+  if (!CsTelemetryModule.instance.isInitialised && !csSdkInitInFlight) {
+    csSdkInitInFlight = true;
     const telemetryConfig = {
       pdata,
       env: 'contentplayer',
@@ -184,6 +198,7 @@ function initializeCsSdk(context: TelemetryContext): void {
         });
       })
       .catch((error: unknown) => {
+        csSdkInitInFlight = false;
         console.warn('[TelemetryService] CS SDK init failed', error);
       });
   }
@@ -363,6 +378,7 @@ export function clearEventQueue(): void {
 /** Reset the CS SDK envelope (test-only escape hatch; mirrors clearEventQueue). */
 export function clearCsTelemetryOptions(): void {
   csEventOptions = null;
+  csSdkInitInFlight = false;
 }
 
 /** Flush queued events to the SDK (only if it exposes a usable logEvent). */

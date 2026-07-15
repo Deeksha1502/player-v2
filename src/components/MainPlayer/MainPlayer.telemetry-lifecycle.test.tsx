@@ -98,4 +98,28 @@ describe('MainPlayer — telemetry lifecycle (Angular parity)', () => {
 
     unsub();
   });
+
+  it('raises START even via the showStartPage:"No" auto-start path (third entry point, bypasses handleStart)', () => {
+    const cfg: PlayerConfig = {
+      context: {},
+      config: { language: 'en' },
+      data: { ...baseData, showStartPage: 'No' },
+    };
+    clearEventQueue();
+    const received: { eid: string }[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e));
+
+    render(
+      <QumlProvider playerConfig={cfg}>
+        <MainPlayer playerConfig={cfg} />
+      </QumlProvider>,
+    );
+
+    // No Start-assessment click needed — the player lands directly in the
+    // assessment. START must still have fired.
+    expect(screen.getByText(/Q1/i)).toBeInTheDocument();
+    expect(received.filter((e) => e.eid === 'START').length).toBe(1);
+
+    unsub();
+  });
 });
