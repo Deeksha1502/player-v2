@@ -35,7 +35,7 @@
 
 .dragging {
   opacity: 0.45;
-  border-color: v.$brick;
+  border-color: var(--qp-primary);
 }
 
 // Visual "draggable" affordance only — the whole row is draggable, not just this.
@@ -46,7 +46,7 @@
 
 .label {
   flex: 1;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   color: v.$g700;
 

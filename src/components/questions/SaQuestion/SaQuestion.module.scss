@@ -49,7 +49,7 @@
 }
 
 .answerText {
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   line-height: v.$lh-relaxed;
   color: v.$g700;

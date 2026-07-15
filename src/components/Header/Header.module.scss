@@ -49,7 +49,7 @@
 }
 
 .counter {
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-medium;
   color: v.$g600;
@@ -65,7 +65,7 @@
   border-radius: v.$r-sm;
   background: v.$g100;
   color: v.$g600;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-xs;
   font-weight: v.$fw-semibold;
   font-variant-numeric: tabular-nums;

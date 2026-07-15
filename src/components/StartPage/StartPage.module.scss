@@ -8,7 +8,7 @@
   overflow-x: hidden;
   padding: v.$space-10;
   background: v.$cream-bg;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 
   @include m.tablet {
     padding: v.$space-8;
@@ -156,7 +156,7 @@
   &:nth-child(3) {
     top: 0;
     left: 1.9rem;
-    background: v.$brick;
+    background: var(--qp-primary);
     transform: rotate(12deg);
   }
 }
@@ -235,7 +235,7 @@
   height: 2.75rem;
   border-radius: v.$r-sm;
   background: v.$cream-bg;
-  color: v.$brick;
+  color: var(--qp-primary);
 
   @include m.mobile {
     width: 2.25rem;
@@ -290,7 +290,7 @@
   background: none;
   border: none;
   color: v.$gray-500;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;
   cursor: pointer;
@@ -400,7 +400,7 @@
   border-radius: v.$r-md;
   box-shadow: v.$shadow-sm;
   text-align: start;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   transition: box-shadow v.$dur-fast v.$ease-out, transform v.$dur-fast v.$ease-out;
 
   @include m.short {
@@ -464,16 +464,16 @@ button.sectionCard {
   padding: v.$space-5;
   border: none;
   border-radius: v.$r-md;
-  background: v.$brick;
+  background: var(--qp-primary);
   color: v.$white;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-md;
   font-weight: v.$fw-semibold;
   cursor: pointer;
   transition: background v.$dur-fast v.$ease-out;
 
   &:hover {
-    background: v.$brick-shade;
+    background: var(--qp-primary-hover);
   }
 
   @include m.short {
@@ -498,9 +498,9 @@ button.sectionCard {
   padding: v.$space-2 v.$space-4;
   border: none;
   border-radius: v.$r-pill;
-  background: v.$brick;
+  background: var(--qp-primary);
   color: v.$white;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;
   cursor: pointer;
@@ -508,7 +508,7 @@ button.sectionCard {
   transition: background v.$dur-fast v.$ease-out;
 
   &:hover {
-    background: v.$brick-shade;
+    background: var(--qp-primary-hover);
   }
 }
 
@@ -527,5 +527,5 @@ button.sectionCard {
 }
 
 .footerIcon {
-  color: v.$brick;
+  color: var(--qp-primary);
 }

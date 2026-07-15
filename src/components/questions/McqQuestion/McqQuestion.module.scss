@@ -25,14 +25,14 @@
   border: 1.5px solid v.$gray-200;
   border-radius: v.$r-xs;
   cursor: pointer;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   color: v.$g600;
   text-align: start;
   transition: border-color v.$dur-fast v.$ease-out, background v.$dur-fast v.$ease-out;
 
   &:hover:not(:disabled) {
-    border-color: v.$brick;
+    border-color: var(--qp-primary);
     background: v.$cream-bg;
   }
 
@@ -43,8 +43,8 @@
 }
 
 .selected {
-  border-color: v.$brick;
-  background: v.$brick-lt;
+  border-color: var(--qp-primary);
+  background: var(--qp-primary-subtle);
 }
 
 .indicator {
@@ -66,21 +66,21 @@
 }
 
 .selected .indicator {
-  border-color: v.$brick;
+  border-color: var(--qp-primary);
 }
 
 .indicatorMark {
   width: 7px;
   height: 7px;
   border-radius: inherit;
-  background: v.$brick;
+  background: var(--qp-primary);
 }
 
 .alpha {
   min-width: 20px;
   font-weight: v.$fw-bold;
   font-size: v.$text-xs;
-  color: v.$brick;
+  color: var(--qp-primary);
 }
 
 .label {

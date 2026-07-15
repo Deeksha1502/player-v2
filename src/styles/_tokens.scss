@@ -1,0 +1,20 @@
+// =============================================================================
+// Design Tokens — Sunbird QuML Player React
+// Same pattern as editor-v2's src/styles/_tokens.scss: the standalone-mode
+// defaults for tokens that get overridden by _portal-bridge.scss when running
+// inside the portal. Bridged tokens use the --qp-* prefix (Player).
+// =============================================================================
+
+:root {
+  // ---------------------------------------------------------------------------
+  // Color — Accent (portal-bridged; see _portal-bridge.scss)
+  // ---------------------------------------------------------------------------
+  --qp-primary:        #a85236;
+  --qp-primary-hover:  #8f4630;
+  --qp-primary-subtle: rgba(168, 82, 54, 0.12);
+
+  // ---------------------------------------------------------------------------
+  // Typography (portal-bridged; see _portal-bridge.scss)
+  // ---------------------------------------------------------------------------
+  --qp-font-sans: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}

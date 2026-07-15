@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   gap: v.$space-2;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 }
 
 .progressMeta {
@@ -38,7 +38,7 @@
 
 .fill {
   height: 100%;
-  background: v.$brick;
+  background: var(--qp-primary);
   border-radius: v.$r-pill;
   transition: width v.$dur-base v.$ease-out;
 }
@@ -66,7 +66,7 @@
   border: 1.5px solid v.$gray-300;
   background: v.$white;
   color: v.$g500;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-xs;
   font-weight: v.$fw-semibold;
   font-variant-numeric: tabular-nums;
@@ -74,8 +74,8 @@
 }
 
 .active .dot {
-  border-color: v.$brick;
-  background: v.$brick;
+  border-color: var(--qp-primary);
+  background: var(--qp-primary);
   color: v.$white;
 }
 

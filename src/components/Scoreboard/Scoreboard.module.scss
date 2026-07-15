@@ -10,7 +10,7 @@
   border-radius: v.$r-lg;
   box-shadow: v.$shadow-card;
   text-align: center;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 
   @include m.short {
     padding: v.$space-4 v.$space-3;

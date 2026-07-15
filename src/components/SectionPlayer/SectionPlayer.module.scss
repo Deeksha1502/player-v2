@@ -80,7 +80,7 @@
 }
 
 .counter {
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-medium;
   color: v.$g600;
@@ -183,5 +183,5 @@
 .error {
   padding: v.$space-6;
   color: v.$danger;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 }

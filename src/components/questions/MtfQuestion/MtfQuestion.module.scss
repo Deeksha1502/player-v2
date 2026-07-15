@@ -13,7 +13,7 @@
   flex-direction: column;
   gap: v.$space-4;
   padding: v.$space-5;
-  background: v.$brick;
+  background: var(--qp-primary);
   border-radius: v.$r-lg;
 }
 
@@ -65,11 +65,11 @@ $mtf-row-height: 6.5rem;
 
 .dragging {
   opacity: 0.45;
-  border-color: v.$brick;
+  border-color: var(--qp-primary);
 }
 
 .term {
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   color: v.$g700;
 

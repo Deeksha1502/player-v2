@@ -84,7 +84,7 @@
   cursor: pointer;
 
   &:hover .brandName {
-    color: v.$brick;
+    color: var(--qp-primary);
   }
 }
 
@@ -99,7 +99,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: v.$r-pill;
-  background: v.$brick;
+  background: var(--qp-primary);
   color: v.$white;
   font-size: v.$text-sm;
   font-weight: v.$fw-bold;
@@ -187,7 +187,7 @@
 }
 
 .active .stepDot {
-  background: v.$brick;
+  background: var(--qp-primary);
   color: v.$white;
 }
 
@@ -245,8 +245,8 @@
 
   &:hover,
   &[aria-expanded='true'] {
-    border-color: v.$brick;
-    color: v.$brick;
+    border-color: var(--qp-primary);
+    color: var(--qp-primary);
   }
 }
 
@@ -303,7 +303,7 @@
   font-weight: v.$fw-bold;
 
   &.active {
-    background: v.$brick;
+    background: var(--qp-primary);
     color: v.$white;
   }
 

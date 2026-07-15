@@ -30,8 +30,8 @@
 }
 
 .filled {
-  background: v.$brick-lt;
-  border-color: v.$brick;
+  background: var(--qp-primary-subtle);
+  border-color: var(--qp-primary);
 }
 
 .over {
@@ -52,11 +52,11 @@
   display: inline-flex;
   align-items: center;
   padding: v.$space-1 v.$space-3;
-  background: v.$brick;
+  background: var(--qp-primary);
   color: v.$white;
   border: none;
   border-radius: v.$r-pill;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-medium;
   cursor: pointer;
@@ -87,7 +87,7 @@
   color: v.$g700;
   border: 1.5px solid v.$gray-200;
   border-radius: v.$r-pill;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-medium;
   cursor: grab;
@@ -99,7 +99,7 @@
   -webkit-user-select: none;
 
   &:hover:not(:disabled) {
-    border-color: v.$brick;
+    border-color: var(--qp-primary);
     background: v.$cream-bg;
   }
 

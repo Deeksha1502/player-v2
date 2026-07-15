@@ -7,7 +7,7 @@
   padding: v.$space-6 v.$space-5;
   background: transparent;
   overflow-y: auto;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 
   @include m.mobile {
     width: 100%;
@@ -54,7 +54,7 @@
 }
 
 .active {
-  border-color: v.$brick;
+  border-color: var(--qp-primary);
   background: v.$ivory;
 }
 
@@ -88,7 +88,7 @@
 }
 
 .badgeActive {
-  background: v.$brick;
+  background: var(--qp-primary);
   color: v.$white;
 
   &::after {

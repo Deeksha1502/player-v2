@@ -23,7 +23,7 @@
   background: v.$ivory;
   border-radius: v.$r-lg;
   box-shadow: v.$shadow-lg;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   animation: modal-in v.$dur-base v.$ease-out;
 }
 

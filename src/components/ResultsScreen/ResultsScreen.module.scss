@@ -7,7 +7,7 @@
   min-height: 100%;
   padding: v.$space-10 v.$space-6;
   background: v.$cream-bg;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 
   @include m.short {
     padding: v.$space-3;

@@ -1,4 +1,9 @@
 @use './variables' as v;
+// Order matters: tokens defines the --qp-* defaults, portal-bridge overrides
+// them (same selector, later in the cascade) when the portal's variables are
+// present.
+@use './tokens';
+@use './portal-bridge';
 
 *,
 *::before,
@@ -25,7 +30,7 @@ body,
 body {
   background: v.$cream-bg;
   color: v.$g700;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   // Never allow the page itself to scroll sideways — wide content scrolls

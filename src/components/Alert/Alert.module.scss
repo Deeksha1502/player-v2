@@ -7,7 +7,7 @@
   border-left: 4px solid v.$gray-300;
   background: v.$g100;
   border-radius: v.$r-sm;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 }
 
 .correct {

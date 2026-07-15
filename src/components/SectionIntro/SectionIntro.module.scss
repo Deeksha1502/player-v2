@@ -42,7 +42,7 @@
   background: none;
   border: none;
   color: v.$gray-500;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;
   cursor: pointer;
@@ -96,7 +96,7 @@
   align-items: center;
   gap: v.$space-5;
   padding: v.$space-10;
-  background: v.$brick;
+  background: var(--qp-primary);
   overflow: hidden;
 
   @include m.mobile {
@@ -252,7 +252,7 @@
   border-radius: v.$r-md;
   background: v.$dark;
   color: v.$white;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-md;
   font-weight: v.$fw-semibold;
   cursor: pointer;

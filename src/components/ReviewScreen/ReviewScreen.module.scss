@@ -6,7 +6,7 @@
   flex-direction: column;
   height: 100%;
   background: v.$cream-bg;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 }
 
 .topbar {

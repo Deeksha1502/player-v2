@@ -10,6 +10,6 @@
   background: v.$danger-bg;
   border-radius: v.$r-sm;
   color: v.$danger;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
 }

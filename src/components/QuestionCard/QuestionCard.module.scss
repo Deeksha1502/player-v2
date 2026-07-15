@@ -36,15 +36,15 @@
   align-items: center;
   padding: v.$space-1 v.$space-3;
   border-radius: v.$r-pill;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-xs;
   font-weight: v.$fw-semibold;
   text-transform: capitalize;
 }
 
 .category {
-  background: v.$brick-lt;
-  color: v.$brick-shade;
+  background: var(--qp-primary-subtle);
+  color: var(--qp-primary-hover);
 }
 
 .difficulty {
@@ -57,7 +57,7 @@
 // portal/editor keep the top-bar counter and never show this.
 .progress {
   display: none;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-xs;
   font-weight: v.$fw-semibold;
   color: v.$g400;

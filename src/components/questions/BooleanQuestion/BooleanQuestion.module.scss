@@ -34,7 +34,7 @@
   border: 1.5px solid v.$gray-200;
   border-radius: v.$r-md;
   cursor: pointer;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-md;
   font-weight: v.$fw-medium;
   color: v.$g600;
@@ -46,7 +46,7 @@
     box-shadow v.$dur-fast v.$ease-out;
 
   &:hover:not(:disabled) {
-    border-color: v.$brick;
+    border-color: var(--qp-primary);
     background: v.$cream-bg;
     transform: translateY(-2px);
     box-shadow: v.$shadow-md;
@@ -60,12 +60,12 @@
 }
 
 .selected {
-  border-color: v.$brick;
-  background: v.$brick-lt;
+  border-color: var(--qp-primary);
+  background: var(--qp-primary-subtle);
   box-shadow: v.$shadow-sm;
 
   .cardLabel {
-    color: v.$brick;
+    color: var(--qp-primary);
     font-weight: v.$fw-semibold;
   }
 }

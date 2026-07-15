@@ -67,7 +67,7 @@
 }
 
 .panelTitle {
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-md;
   font-weight: v.$fw-semibold;
   color: v.$dark;

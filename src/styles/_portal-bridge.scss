@@ -1,0 +1,39 @@
+// =============================================================================
+// Portal Theme Bridge — Sunbird QuML Player React
+//
+// Same two-layer pattern as editor-v2 (_tokens.scss + _portal-bridge.scss):
+// this file is imported AFTER _tokens.scss in global.scss, so its `:host,
+// :root` rule below OVERRIDES the same --qp-* property names _tokens.scss
+// just defined — normal CSS cascade (last declaration on an equal-specificity
+// selector wins), no !important needed.
+//
+// Bridges the player's accent color + font to the Sunbird Spark Portal's CSS
+// custom properties (set on document.documentElement by the portal's
+// ThemeProvider). Custom properties are INHERITED, not shadow-DOM-encapsulated,
+// so :host — the shadow root's host element — already sees the portal's live
+// values with no JS/config wiring at all; :root is included too for the dev
+// harness (src/App.tsx), which renders MainPlayer directly with no shadow root.
+//
+// Scope here is intentionally accent-only (primary/hover/subtle + font) — the
+// player's own warm terracotta surfaces/neutrals are a deliberate, distinct
+// visual identity (see variables.scss's own "$dark: PRIMARY CTA buttons (dark,
+// not terracotta)" comment) and are NOT bridged.
+//
+// Portal variable format: --primary: H S% L% (raw HSL triplet, no hsl() wrapper)
+// Portal font token:      --app-font-family
+//
+// The fallback values below (not _tokens.scss's, which are only reached if
+// THIS file were ever removed) are what actually renders standalone (dev
+// harness, mobile app, editor preview) — they reproduce the player's
+// pre-bridge terracotta/Rubik default. Inside the portal, its live values
+// take over automatically.
+// =============================================================================
+
+:host,
+:root {
+  --qp-font-sans: var(--app-font-family, 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+
+  --qp-primary:        hsl(var(--primary, 15 51% 44%));
+  --qp-primary-hover:  hsl(var(--primary, 14 50% 37%));
+  --qp-primary-subtle: hsl(var(--primary, 15 51% 44%) / 0.12);
+}
