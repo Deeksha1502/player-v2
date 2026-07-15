@@ -30,6 +30,10 @@ export function SectionIntro({
   const letter = String.fromCharCode(65 + sectionIndex);
   const questionCount = section.children?.length ?? 0;
   const instructions = readI18n(section.instructions, language) || t(language, 'MANDATORY_NOTE');
+  // The section's actual authored name (matching StartPage's section cards /
+  // Sidebar) — falls back to "Section {letter}" only when a section genuinely
+  // has no name.
+  const sectionName = readI18n(section.name, language) || `${t(language, 'SECTION')} ${letter}`;
 
   return (
     <div className={styles.wrap}>
@@ -41,7 +45,7 @@ export function SectionIntro({
             onClick={onPrevious}
             aria-label={t(language, 'PREVIOUS')}
           >
-            <PreviousIcon size={16} /> {t(language, 'PREVIOUS')}
+            <PreviousIcon size={16} /> <span className={styles.backBtnLabel}>{t(language, 'PREVIOUS')}</span>
           </button>
         )}
 
@@ -51,9 +55,7 @@ export function SectionIntro({
               {letter}
             </span>
             <div className={styles.bannerText}>
-              <p className={styles.bannerEyebrow}>
-                {t(language, 'SECTION')} {letter}
-              </p>
+              <p className={styles.bannerEyebrow}>{sectionName}</p>
               <h1 className={styles.bannerTitle}>
                 {questionCount} {t(language, 'QUESTIONS')}
               </h1>

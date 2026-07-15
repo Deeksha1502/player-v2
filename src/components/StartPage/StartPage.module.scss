@@ -298,6 +298,37 @@
   &:hover {
     color: v.$g900;
   }
+
+  // Mobile-app only — match the icon-only floating Prev pill used on the
+  // question screens (SectionPlayer/ReviewScreen .navPrev), instead of an
+  // inline text link, for a consistent Previous affordance across the app.
+  // Anchors to `.overview` (position:relative under m.compact, same as
+  // `.nextBtn`).
+  @include m.compact {
+    position: absolute;
+    top: 50%;
+    left: v.$space-1;
+    transform: translateY(-50%);
+    z-index: 5;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-bottom: 0;
+    padding: 0;
+    border-radius: v.$r-pill;
+    background: v.$white;
+    box-shadow: v.$shadow-sm;
+
+    &:hover {
+      color: v.$gray-500;
+    }
+  }
+}
+
+.backBtnLabel {
+  @include m.compact {
+    display: none;
+  }
 }
 
 .sectionsHeading {

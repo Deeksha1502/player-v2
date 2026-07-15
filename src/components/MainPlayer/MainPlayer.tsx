@@ -603,6 +603,23 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
         />
       );
 
+    // Mobile-app only (PlayerHeader's .sectionLabel is hidden outside
+    // m.compact) — replaces the section-intro banner there. Only set during
+    // the section-intro stage; assessment keeps the existing step dots.
+    // Uses the section's actual authored name (matching StartPage's section
+    // cards / Sidebar), falling back to "Section {letter}" only when a
+    // section genuinely has no name.
+    const sectionLabel =
+      stage === 'sectionIntro' && currentSection
+        ? `${
+            readI18n(currentSection.name, language) ||
+            `${t(language, 'SECTION')} ${String.fromCharCode(65 + state.currentSectionIndex)}`
+          } · ${currentSection.children.length} ${t(
+            language,
+            currentSection.children.length === 1 ? 'QUESTION' : 'QUESTIONS',
+          )}`
+        : undefined;
+
     // The header timer is gated by the content's `showTimer` flag (Angular parity).
     // When enabled: countdown if a time limit exists, count-up elapsed otherwise.
     // When disabled: both props are null, so PlayerHeader renders no timer at all.
@@ -620,6 +637,7 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
           onSubmit={handleSubmitAssessment}
           onMenuClick={() => setDrawerOpen(true)}
           onBrandClick={() => setStage('overview')}
+          sectionLabel={sectionLabel}
           language={language}
         />
 

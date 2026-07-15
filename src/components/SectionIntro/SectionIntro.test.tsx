@@ -18,13 +18,27 @@ const section: Section = {
 };
 
 describe('SectionIntro', () => {
-  it('renders the section letter banner, count and instructions', () => {
+  it('renders the section name (not a generic letter), count and instructions', () => {
     render(
       <SectionIntro section={section} sectionIndex={0} totalSections={3} onBegin={vi.fn()} />,
     );
-    expect(screen.getByText(/^section a$/i)).toBeInTheDocument();
+    // The actual authored name, not "Section A".
+    expect(screen.getByText('Knowledge Check')).toBeInTheDocument();
+    expect(screen.queryByText(/^section a$/i)).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /2 Questions/i })).toBeInTheDocument();
     expect(screen.getByText('Answer all questions.')).toBeInTheDocument();
+  });
+
+  it('falls back to "Section {letter}" when the section has no name', () => {
+    render(
+      <SectionIntro
+        section={{ ...section, name: '' }}
+        sectionIndex={1}
+        totalSections={3}
+        onBegin={vi.fn()}
+      />,
+    );
+    expect(screen.getByText(/^section b$/i)).toBeInTheDocument();
   });
 
   it('falls back to a default instruction when none is provided', () => {

@@ -7,6 +7,8 @@
   justify-content: center;
   min-height: 100%;
   padding: v.$space-12 v.$space-8;
+  // Positioning context for .backBtn in compact mode (see below).
+  position: relative;
 
   @include m.mobile {
     padding: v.$space-6 v.$space-4;
@@ -15,6 +17,7 @@
   @include m.short {
     padding: v.$space-3 v.$space-4;
   }
+
 }
 
 // Groups the back link + card into a single column so `.wrap`'s existing
@@ -47,6 +50,35 @@
   &:hover {
     color: v.$g900;
   }
+
+  // Mobile-app only — match the icon-only floating Prev pill used on the
+  // question screens (SectionPlayer/ReviewScreen .navPrev), instead of an
+  // inline text link, for a consistent Previous affordance across the app.
+  @include m.compact {
+    position: absolute;
+    top: 50%;
+    left: v.$space-1;
+    transform: translateY(-50%);
+    z-index: 5;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-bottom: 0;
+    padding: 0;
+    border-radius: v.$r-pill;
+    background: v.$white;
+    box-shadow: v.$shadow-sm;
+
+    &:hover {
+      color: v.$gray-500;
+    }
+  }
+}
+
+.backBtnLabel {
+  @include m.compact {
+    display: none;
+  }
 }
 
 .card {
@@ -74,6 +106,12 @@
   @include m.short {
     padding: v.$space-3;
     gap: v.$space-3;
+  }
+
+  // Mobile-app only — the section/question-count info moves into the navbar
+  // instead (PlayerHeader's .sectionLabel), so this banner is redundant there.
+  @include m.compact {
+    display: none;
   }
 }
 
@@ -161,6 +199,19 @@
 
   @include m.short {
     padding: v.$space-3;
+  }
+
+  // Mobile-app only — a self-contained cap in viewport units (dvh), not a
+  // percentage of an ancestor's height. `.instructions` sits 6 flex levels
+  // deep here (.main > .wrap > .column > .card > .body > .instructions);
+  // a height:100%/flex:1 chain that far down turned out to be too fragile
+  // to reliably verify (any single missing min-height:0 along the way
+  // silently no-ops the whole thing). A dvh cap works regardless of that
+  // chain — long instructions text scrolls within this box; "Start section"
+  // stays reachable below it either way.
+  @include m.compact {
+    max-height: 40dvh;
+    overflow-y: auto;
   }
 }
 
