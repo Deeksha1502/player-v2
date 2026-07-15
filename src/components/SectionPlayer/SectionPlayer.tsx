@@ -12,6 +12,7 @@ import { t } from '../../i18n/translations';
 import { calculateScore } from '../../registry/scoring-registry';
 import { isAnswered } from '../../utils/answered';
 import { canGoToNextQuestion, isQuestionSkippable } from '../../services/navigation-service';
+import { pageId } from '../../utils/constants';
 import type { MediaItem, MediaResolveContext } from '../../utils/media';
 import type { Question, Section, UserResponse } from '../../types';
 import styles from './SectionPlayer.module.scss';
@@ -40,7 +41,7 @@ interface SectionPlayerProps {
 
 export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: SectionPlayerProps) {
   const { state, storeAnswer, setCurrentQuestion } = useQuml();
-  const { logOptionSelected, logAnswerSubmitted } = useTelemetry();
+  const { logOptionSelected, logAnswerSubmitted, logPageViewed, logResponse } = useTelemetry();
   const language = state.language;
 
   const questions: Question[] = section?.children ?? [];
@@ -59,6 +60,12 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
   useEffect(() => {
     setCurrentSlide(externalIndex);
   }, [externalIndex]);
+
+  // Angular parity (viewer-service raiseHeartBeatEvent 'impression') — one
+  // IMPRESSION per question view.
+  useEffect(() => {
+    logPageViewed(pageId.QUESTION_PAGE);
+  }, [externalIndex, logPageViewed]);
 
   // Feedback dwell: how long the Correct/Wrong toast stays on the current
   // question before auto-advancing (see proceedWithFeedback).
@@ -102,9 +109,12 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
     // with the results screen (which also scales by maxScore).
     const maxScore = currentQuestion.maxScore ?? 1;
     const earned = calculateScore(currentQuestion, answer, language) * maxScore;
+    // Angular parity: index is 1-based within the section (currentIndex + 1);
+    // resvalues wraps the selected value(s) as an array (section-player.component.ts's `[option.option]`).
     logAnswerSubmitted(
-      currentQuestion.identifier,
-      selected as string | string[],
+      currentQuestion,
+      currentSlide + 1,
+      Array.isArray(selected) ? selected : [selected],
       earned,
       maxScore,
     );
@@ -165,7 +175,18 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
   const canAdvance = canGoToNextQuestion(currentSlide, questions, state.answers, { requireAnswer });
   const handleNext = () => {
     proceedWithFeedback(() => {
-      if (canAdvance) goTo(currentSlide + 1);
+      if (!canAdvance) return;
+      // Angular parity (section-player.component.ts:346, nextSlide()) — RESPONSE
+      // fires once per question, on navigating away from it via Next, using
+      // whatever was last selected (undefined if left unanswered). Distinct
+      // from ASSESS (fires on answering) and INTERACT (fires on every click).
+      const leavingQuestion = questions[currentSlide];
+      const leavingAnswer = state.answers[leavingQuestion.identifier];
+      const option = leavingAnswer
+        ? (leavingAnswer.value ?? leavingAnswer.order ?? leavingAnswer.responses ?? leavingAnswer.matches)
+        : undefined;
+      logResponse(leavingQuestion.identifier, leavingQuestion.qType, option);
+      goTo(currentSlide + 1);
     });
   };
   const handlePrevious = () => {

@@ -14,6 +14,7 @@ vi.mock('../../context/useTelemetry', () => ({
     logOptionSelected: vi.fn(),
     logAnswerSubmitted: vi.fn(),
     logPageViewed: vi.fn(),
+    logResponse: vi.fn(),
   }),
 }));
 

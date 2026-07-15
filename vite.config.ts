@@ -64,6 +64,19 @@ export default defineConfig(({ command }) => {
         '/question': 'http://localhost:9000',
         '/questions': 'http://localhost:9000',
         '/api': 'http://localhost:9000',
+        // telemetry-service is a separate cluster service, port-forwarded to
+        // 9001 (not the content/KP backend on 9000). The player never sets
+        // context.apislug (neither does the portal's own telemetryContextBuilder.ts),
+        // so the legacy telemetry-sdk's own built-in default ('/action') applies —
+        // the real request path is /action/data/v3/telemetry, matching the
+        // portal's documented gateway convention. The local telemetry-service
+        // pod itself only serves /v1/telemetry directly (confirmed via its own
+        // request logs) — rewrite for local dev only, same pattern as the
+        // questionset v2→v5 rewrites above.
+        '/action/data/v3/telemetry': {
+          target: 'http://localhost:9001',
+          rewrite: (p: string) => p.replace('/action/data/v3/telemetry', '/v1/telemetry'),
+        },
       },
     },
 

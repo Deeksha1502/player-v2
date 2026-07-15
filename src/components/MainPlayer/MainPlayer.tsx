@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useQuml } from '../../context/useQuml';
+import { useTelemetry } from '../../context/useTelemetry';
 import { SectionPlayer } from '../SectionPlayer/SectionPlayer';
 import { StartPage } from '../StartPage/StartPage';
 import { SectionIntro } from '../SectionIntro/SectionIntro';
@@ -84,6 +85,18 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   // the only path that clears this, since it's the only path that actually
   // restarts from zero).
   const [hasStarted, setHasStarted] = useState(false);
+  // Anchors assessment duration for telemetry END (Angular parity:
+  // viewer-service.ts's qumlPlayerStartTime). Set once, the first time the
+  // assessment is actually entered this attempt; read at submit time.
+  const telemetryStartRef = useRef<number | null>(null);
+  // Angular parity: viewer-service.ts's qumlPlayerStartTime is set at
+  // ViewerService.initialize() — player construction — and START's own
+  // `duration` is Date.now() minus THIS anchor (time spent on the overview
+  // before clicking Start), not the attempt-duration anchor above. useRef's
+  // initializer only runs once, on first render, so this is effectively
+  // "player mounted at".
+  const playerMountedAtRef = useRef<number>(Date.now());
+  const { logAssessmentStart, logAssessmentEnd, logSummary } = useTelemetry();
 
   // Section intros can be disabled via config (spec §6.0).
   const sectionIntrosEnabled =
@@ -395,6 +408,10 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setCurrentQuestion(0);
     beginAssessmentTimer();
     setHasStarted(true);
+    if (telemetryStartRef.current == null) {
+      telemetryStartRef.current = Date.now();
+      logAssessmentStart(Date.now() - playerMountedAtRef.current);
+    }
     setStage(sectionIntrosEnabled ? 'sectionIntro' : 'assessment');
   };
 
@@ -409,6 +426,10 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setCurrentQuestion(0);
     beginAssessmentTimer();
     setHasStarted(true);
+    if (telemetryStartRef.current == null) {
+      telemetryStartRef.current = Date.now();
+      logAssessmentStart(Date.now() - playerMountedAtRef.current);
+    }
     setStage(sectionIntrosEnabled ? 'sectionIntro' : 'assessment');
   };
 
@@ -423,6 +444,14 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setSubmitDialog(false);
     setStage('results');
     onPlayerEvent?.({ type: 'quizEnd', summary });
+    const durationMs = telemetryStartRef.current != null ? Date.now() - telemetryStartRef.current : 0;
+    logAssessmentEnd(globalQuestionNumber, overview.totalQuestions, durationMs);
+    logSummary({
+      correct: summary.correct,
+      wrong: summary.incorrect,
+      partial: summary.partial,
+      score: summary.totalScore,
+    });
     // Angular parity (main-player.component.ts:483-485 raiseEndEvent) — flag
     // to the host that this attempt, now finished, was the last one allowed.
     if (maxAttempts != null && state.attemptNumber >= maxAttempts) {
@@ -457,6 +486,7 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setTimeElapsed(0);
     setSubmitDialog(false);
     setHasStarted(false);
+    telemetryStartRef.current = null;
     setStage('overview');
   };
 
@@ -496,6 +526,13 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setCurrentQuestion(0);
     beginAssessmentTimer();
     setHasStarted(true);
+    // Same START telemetry as handleStart/handleSectionSelectFromOverview —
+    // this effect is a THIRD path into the assessment (showStartPage:'No')
+    // that bypasses both, so it needs its own copy of the same one-shot guard.
+    if (telemetryStartRef.current == null) {
+      telemetryStartRef.current = Date.now();
+      logAssessmentStart(Date.now() - playerMountedAtRef.current);
+    }
     setStage('assessment');
     // Guarded by the ref; the setters/timer are stable enough here.
     // eslint-disable-next-line react-hooks/exhaustive-deps
