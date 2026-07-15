@@ -50,4 +50,16 @@ describe('PlayerHeader', () => {
     fireEvent.click(screen.getByRole('button', { name: /sunbird/i }));
     expect(onBrandClick).toHaveBeenCalledTimes(1);
   });
+
+  // Mobile-app only (see PlayerHeader.module.scss .sectionLabel — hidden
+  // outside m.compact); this just verifies MainPlayer's text reaches the DOM.
+  it('renders sectionLabel when provided (section-intro stage only)', () => {
+    render(<PlayerHeader {...baseProps} sectionLabel="Section A · 2 Questions" />);
+    expect(screen.getByText('Section A · 2 Questions')).toBeInTheDocument();
+  });
+
+  it('omits sectionLabel when not provided', () => {
+    render(<PlayerHeader {...baseProps} />);
+    expect(screen.queryByText(/·/)).not.toBeInTheDocument();
+  });
 });

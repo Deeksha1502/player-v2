@@ -122,6 +122,25 @@
   }
 }
 
+// Mobile-app only — replaces SectionIntro's banner (removed there in compact
+// mode, see SectionIntro.module.scss .banner) with a compact text label in the
+// navbar instead. Hidden outside m.compact; MainPlayer only passes this prop
+// during the section-intro stage anyway.
+.sectionLabel {
+  display: none;
+  min-width: 0;
+  font-size: v.$text-sm;
+  font-weight: v.$fw-semibold;
+  color: v.$g700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @include m.compact {
+    display: inline-block;
+  }
+}
+
 // ── Section steps ────────────────────────────────────────────────────────────
 .steps {
   display: flex;

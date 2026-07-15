@@ -61,6 +61,17 @@ describe('MainPlayer', () => {
     expect(screen.getByText(/Question 1 of 1/i)).toBeInTheDocument();
   });
 
+  // Mobile-app only (PlayerHeader's .sectionLabel is hidden outside
+  // m.compact) — this just verifies MainPlayer computes/passes the text only
+  // during the section-intro stage, not during the assessment stage.
+  it('passes a sectionLabel to the header only during section-intro', () => {
+    renderPlayer();
+    fireEvent.click(screen.getByRole('button', { name: /start assessment/i }));
+    expect(screen.getByText('Section 1 · 1 Question')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /start section/i }));
+    expect(screen.queryByText('Section 1 · 1 Question')).not.toBeInTheDocument();
+  });
+
   it('does not flash feedback on selection; proceeds (non-blocking) on Submit', () => {
     vi.useFakeTimers();
     try {

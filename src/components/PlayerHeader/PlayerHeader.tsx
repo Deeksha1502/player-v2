@@ -29,6 +29,13 @@ export interface PlayerHeaderProps {
   onMenuClick?: () => void;
   /** Click the brand to return to the overview / start page. */
   onBrandClick?: () => void;
+  /**
+   * Mobile-app only (see `.sectionLabel` — hidden outside `m.compact`) — e.g.
+   * "Section A · 2 Questions", shown in place of the section-intro screen's
+   * banner (removed there in compact mode). Omit outside the section-intro
+   * stage.
+   */
+  sectionLabel?: string;
   language?: string;
 }
 
@@ -50,6 +57,7 @@ export function PlayerHeader({
   onSubmit,
   onMenuClick,
   onBrandClick,
+  sectionLabel,
   language = 'en',
 }: PlayerHeaderProps) {
   // Countdown takes precedence; count-up shows when there is no time limit.
@@ -83,6 +91,8 @@ export function PlayerHeader({
           </span>
           <span className={styles.brandName}>{brand}</span>
         </button>
+
+        {sectionLabel && <span className={styles.sectionLabel}>{sectionLabel}</span>}
 
         <ol className={styles.steps} aria-label={t(language, 'SECTIONS')}>
           {sections.map((section, index) => {

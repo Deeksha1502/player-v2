@@ -142,7 +142,7 @@ export function StartPage({
                 onClick={() => setStep('info')}
                 aria-label={t(language, 'PREVIOUS')}
               >
-                <PreviousIcon size={16} /> {t(language, 'PREVIOUS')}
+                <PreviousIcon size={16} /> <span className={styles.backBtnLabel}>{t(language, 'PREVIOUS')}</span>
               </button>
             )}
 
