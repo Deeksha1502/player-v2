@@ -108,6 +108,12 @@ describe('SectionPlayer', () => {
     const twoMarkSection: Section = { ...section, children: [q2, mcq('q2')] };
     wrap(<SectionPlayer section={twoMarkSection} />);
     fireEvent.click(screen.getAllByRole('radio')[0]); // correct option (value 0)
-    expect(logAnswerSubmitted).toHaveBeenLastCalledWith('q1', expect.anything(), 2, 2);
+    expect(logAnswerSubmitted).toHaveBeenLastCalledWith(
+      expect.objectContaining({ identifier: 'q1' }),
+      expect.anything(),
+      expect.anything(),
+      2,
+      2,
+    );
   });
 });

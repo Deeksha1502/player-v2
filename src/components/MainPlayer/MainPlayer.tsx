@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useQuml } from '../../context/useQuml';
+import { useTelemetry } from '../../context/useTelemetry';
 import { SectionPlayer } from '../SectionPlayer/SectionPlayer';
 import { StartPage } from '../StartPage/StartPage';
 import { SectionIntro } from '../SectionIntro/SectionIntro';
@@ -84,6 +85,11 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   // the only path that clears this, since it's the only path that actually
   // restarts from zero).
   const [hasStarted, setHasStarted] = useState(false);
+  // Anchors assessment duration for telemetry START/END events (Angular parity:
+  // viewer-service.ts's qumlPlayerStartTime). Set once, the first time the
+  // assessment is actually entered this attempt; read at submit time.
+  const telemetryStartRef = useRef<number | null>(null);
+  const { logAssessmentStart, logAssessmentEnd, logSummary } = useTelemetry();
 
   // Section intros can be disabled via config (spec §6.0).
   const sectionIntrosEnabled =
@@ -395,6 +401,10 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setCurrentQuestion(0);
     beginAssessmentTimer();
     setHasStarted(true);
+    if (telemetryStartRef.current == null) {
+      telemetryStartRef.current = Date.now();
+      logAssessmentStart(0);
+    }
     setStage(sectionIntrosEnabled ? 'sectionIntro' : 'assessment');
   };
 
@@ -409,6 +419,10 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setCurrentQuestion(0);
     beginAssessmentTimer();
     setHasStarted(true);
+    if (telemetryStartRef.current == null) {
+      telemetryStartRef.current = Date.now();
+      logAssessmentStart(0);
+    }
     setStage(sectionIntrosEnabled ? 'sectionIntro' : 'assessment');
   };
 
@@ -423,6 +437,14 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setSubmitDialog(false);
     setStage('results');
     onPlayerEvent?.({ type: 'quizEnd', summary });
+    const durationMs = telemetryStartRef.current != null ? Date.now() - telemetryStartRef.current : 0;
+    logAssessmentEnd(globalQuestionNumber, overview.totalQuestions, durationMs);
+    logSummary({
+      correct: summary.correct,
+      wrong: summary.incorrect,
+      partial: summary.partial,
+      score: summary.totalScore,
+    });
     // Angular parity (main-player.component.ts:483-485 raiseEndEvent) — flag
     // to the host that this attempt, now finished, was the last one allowed.
     if (maxAttempts != null && state.attemptNumber >= maxAttempts) {
@@ -457,6 +479,7 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setTimeElapsed(0);
     setSubmitDialog(false);
     setHasStarted(false);
+    telemetryStartRef.current = null;
     setStage('overview');
   };
 

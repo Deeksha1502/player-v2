@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { QumlProvider } from './context/QumlContext';
 import { MainPlayer } from './components/MainPlayer/MainPlayer';
 import { sampleConfig } from './dev/sample-data';
+import { initializeTelemetry } from './services/telemetry-service';
 import type { PlayerConfig } from './types';
 
 /**
@@ -39,6 +41,14 @@ function resolveConfig(): PlayerConfig {
 
 function App() {
   const playerConfig = resolveConfig();
+
+  // Dev harness only — the actual web component (element-registration.tsx)
+  // calls this itself before mounting React. `App.tsx` mounts MainPlayer
+  // directly (no web component wrapper), so without this, `npm run dev` never
+  // initializes telemetry and every raise* call silently no-ops.
+  useEffect(() => {
+    initializeTelemetry(playerConfig.context);
+  }, [playerConfig.context]);
 
   return (
     <QumlProvider playerConfig={playerConfig}>
