@@ -5,13 +5,17 @@ import { QumlProvider } from '../../context/QumlContext';
 import { SectionPlayer } from './SectionPlayer';
 import type { PlayerConfig, Question, Section } from '../../types';
 
-// Capture ASSESS telemetry so we can assert the emitted score/maxScore pair.
-const { logAnswerSubmitted } = vi.hoisted(() => ({ logAnswerSubmitted: vi.fn() }));
+// Capture ASSESS/RESPONSE telemetry so we can assert their arguments.
+const { logAnswerSubmitted, logResponse } = vi.hoisted(() => ({
+  logAnswerSubmitted: vi.fn(),
+  logResponse: vi.fn(),
+}));
 vi.mock('../../context/useTelemetry', () => ({
   useTelemetry: () => ({
     logOptionSelected: vi.fn(),
     logAnswerSubmitted,
     logPageViewed: vi.fn(),
+    logResponse,
   }),
 }));
 
@@ -115,5 +119,43 @@ describe('SectionPlayer', () => {
       2,
       2,
     );
+  });
+
+  it('RESPONSE fires on Next for the question being left, with its selected option', () => {
+    vi.useFakeTimers();
+    try {
+      logResponse.mockClear();
+      wrap(<SectionPlayer section={section} />);
+      fireEvent.click(screen.getAllByRole('radio')[0]); // select value 0 on q1
+      fireEvent.click(screen.getByRole('button', { name: /next/i }));
+      act(() => vi.advanceTimersByTime(1000)); // past the feedback dwell
+      expect(logResponse).toHaveBeenCalledWith('q1', undefined, 0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('RESPONSE does NOT fire on Previous (Angular parity: nextSlide()-only)', () => {
+    vi.useFakeTimers();
+    try {
+      logResponse.mockClear();
+      wrap(<SectionPlayer section={section} />);
+      fireEvent.click(screen.getAllByRole('radio')[0]);
+      fireEvent.click(screen.getByRole('button', { name: /next/i })); // 1 RESPONSE call (leaving q1)
+      act(() => vi.advanceTimersByTime(1000));
+      logResponse.mockClear();
+      fireEvent.click(screen.getByRole('button', { name: /previous/i }));
+      expect(logResponse).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('RESPONSE carries option:undefined when leaving an unanswered question', () => {
+    logResponse.mockClear();
+    const skippableSection: Section = { ...section, allowSkip: true };
+    wrap(<SectionPlayer section={skippableSection} />);
+    fireEvent.click(screen.getByRole('button', { name: /next/i })); // leave q1 unanswered
+    expect(logResponse).toHaveBeenCalledWith('q1', undefined, undefined);
   });
 });

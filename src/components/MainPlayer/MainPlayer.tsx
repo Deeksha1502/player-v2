@@ -85,10 +85,17 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   // the only path that clears this, since it's the only path that actually
   // restarts from zero).
   const [hasStarted, setHasStarted] = useState(false);
-  // Anchors assessment duration for telemetry START/END events (Angular parity:
+  // Anchors assessment duration for telemetry END (Angular parity:
   // viewer-service.ts's qumlPlayerStartTime). Set once, the first time the
   // assessment is actually entered this attempt; read at submit time.
   const telemetryStartRef = useRef<number | null>(null);
+  // Angular parity: viewer-service.ts's qumlPlayerStartTime is set at
+  // ViewerService.initialize() — player construction — and START's own
+  // `duration` is Date.now() minus THIS anchor (time spent on the overview
+  // before clicking Start), not the attempt-duration anchor above. useRef's
+  // initializer only runs once, on first render, so this is effectively
+  // "player mounted at".
+  const playerMountedAtRef = useRef<number>(Date.now());
   const { logAssessmentStart, logAssessmentEnd, logSummary } = useTelemetry();
 
   // Section intros can be disabled via config (spec §6.0).
@@ -403,7 +410,7 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setHasStarted(true);
     if (telemetryStartRef.current == null) {
       telemetryStartRef.current = Date.now();
-      logAssessmentStart(0);
+      logAssessmentStart(Date.now() - playerMountedAtRef.current);
     }
     setStage(sectionIntrosEnabled ? 'sectionIntro' : 'assessment');
   };
@@ -421,7 +428,7 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     setHasStarted(true);
     if (telemetryStartRef.current == null) {
       telemetryStartRef.current = Date.now();
-      logAssessmentStart(0);
+      logAssessmentStart(Date.now() - playerMountedAtRef.current);
     }
     setStage(sectionIntrosEnabled ? 'sectionIntro' : 'assessment');
   };

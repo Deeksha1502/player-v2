@@ -7,6 +7,7 @@ const raiseStartTelemetry = vi.fn();
 const raiseEndTelemetry = vi.fn();
 const raiseSummaryTelemetry = vi.fn();
 const raiseErrorTelemetry = vi.fn();
+const raiseResponseTelemetry = vi.fn();
 const initTelemetry = vi.fn();
 let isInitialised = false;
 const init = vi.fn().mockImplementation(() => {
@@ -31,6 +32,7 @@ vi.mock('@project-sunbird/client-services/telemetry', () => ({
           raiseEndTelemetry,
           raiseSummaryTelemetry,
           raiseErrorTelemetry,
+          raiseResponseTelemetry,
         },
       };
     },
@@ -47,6 +49,7 @@ const {
   raiseEndEvent,
   raiseSummaryEvent,
   raiseErrorEvent,
+  raiseResponseEvent,
   clearCsTelemetryOptions,
 } = await import('./telemetry-service');
 
@@ -75,6 +78,7 @@ describe('telemetry-service — CS SDK integration', () => {
     raiseEndEvent({ a: 1 });
     raiseSummaryEvent({ a: 1 });
     raiseErrorEvent({ a: 1 });
+    raiseResponseEvent({ a: 1 });
 
     expect(init).not.toHaveBeenCalled();
     expect(raiseInteractTelemetry).not.toHaveBeenCalled();
@@ -84,6 +88,7 @@ describe('telemetry-service — CS SDK integration', () => {
     expect(raiseEndTelemetry).not.toHaveBeenCalled();
     expect(raiseSummaryTelemetry).not.toHaveBeenCalled();
     expect(raiseErrorTelemetry).not.toHaveBeenCalled();
+    expect(raiseResponseTelemetry).not.toHaveBeenCalled();
   });
 
   it('initializes the CS SDK when a real context is provided', () => {
@@ -170,6 +175,16 @@ describe('telemetry-service — CS SDK integration', () => {
     initializeTelemetry(fullContext as any);
     raiseErrorEvent({ err: 'LOAD', errtype: 'content', stacktrace: '' });
     expect(raiseErrorTelemetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('raiseResponseEvent forwards to raiseResponseTelemetry(data, options)', () => {
+    initializeTelemetry(fullContext as any);
+    raiseResponseEvent({ target: { id: 'q1', ver: '1.0', type: 'MCQ' }, type: 'CHOOSE', values: [{ option: 0 }] });
+
+    expect(raiseResponseTelemetry).toHaveBeenCalledTimes(1);
+    const [data, options] = raiseResponseTelemetry.mock.calls[0];
+    expect(data).toMatchObject({ target: { id: 'q1' } });
+    expect(options.context).toBeDefined();
   });
 
   it('clears the envelope so a later empty-context init stops sending to the CS SDK', () => {

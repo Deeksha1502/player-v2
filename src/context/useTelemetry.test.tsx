@@ -114,4 +114,26 @@ describe('useTelemetry', () => {
     expect(events[0].eid).toBe('ERROR');
     expect(events[0].edata).toMatchObject({ err: 'LOAD', errtype: 'content' });
   });
+
+  it('logResponse queues a RESPONSE event with target/values (Angular parity)', () => {
+    const { result } = renderHook(() => useTelemetry());
+    act(() => result.current.logResponse('q1', 'MCQ', 0));
+
+    const events = getQueuedEvents();
+    expect(events).toHaveLength(1);
+    expect(events[0].eid).toBe('RESPONSE');
+    expect(events[0].edata).toMatchObject({
+      target: { id: 'q1', ver: '1.0', type: 'MCQ' },
+      type: 'CHOOSE',
+      values: [{ option: 0 }],
+    });
+  });
+
+  it('logResponse carries option:undefined when the question was left unanswered', () => {
+    const { result } = renderHook(() => useTelemetry());
+    act(() => result.current.logResponse('q2', 'MCQ', undefined));
+
+    const events = getQueuedEvents();
+    expect(events[0].edata).toMatchObject({ values: [{ option: undefined }] });
+  });
 });

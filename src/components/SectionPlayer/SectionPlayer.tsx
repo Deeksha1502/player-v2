@@ -41,7 +41,7 @@ interface SectionPlayerProps {
 
 export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: SectionPlayerProps) {
   const { state, storeAnswer, setCurrentQuestion } = useQuml();
-  const { logOptionSelected, logAnswerSubmitted, logPageViewed } = useTelemetry();
+  const { logOptionSelected, logAnswerSubmitted, logPageViewed, logResponse } = useTelemetry();
   const language = state.language;
 
   const questions: Question[] = section?.children ?? [];
@@ -175,7 +175,18 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
   const canAdvance = canGoToNextQuestion(currentSlide, questions, state.answers, { requireAnswer });
   const handleNext = () => {
     proceedWithFeedback(() => {
-      if (canAdvance) goTo(currentSlide + 1);
+      if (!canAdvance) return;
+      // Angular parity (section-player.component.ts:346, nextSlide()) — RESPONSE
+      // fires once per question, on navigating away from it via Next, using
+      // whatever was last selected (undefined if left unanswered). Distinct
+      // from ASSESS (fires on answering) and INTERACT (fires on every click).
+      const leavingQuestion = questions[currentSlide];
+      const leavingAnswer = state.answers[leavingQuestion.identifier];
+      const option = leavingAnswer
+        ? (leavingAnswer.value ?? leavingAnswer.order ?? leavingAnswer.responses ?? leavingAnswer.matches)
+        : undefined;
+      logResponse(leavingQuestion.identifier, leavingQuestion.qType, option);
+      goTo(currentSlide + 1);
     });
   };
   const handlePrevious = () => {

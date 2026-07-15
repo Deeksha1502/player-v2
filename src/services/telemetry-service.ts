@@ -336,6 +336,20 @@ export function raiseErrorEvent(data: unknown): void {
   }
 }
 
+/**
+ * Raise a RESPONSE event (Angular parity: viewer-service.ts:raiseResponseEvent,
+ * called from section-player.component.ts's nextSlide() for the question being
+ * LEFT, not the one just answered — distinct from ASSESS).
+ */
+export function raiseResponseEvent(data: unknown): void {
+  const event: TelemetryEvent = { eid: 'RESPONSE', edata: data, timestamp: Date.now() };
+  sendToSdk(event);
+  emit(event);
+  if (csEventOptions) {
+    CsTelemetryModule.instance.telemetryService.raiseResponseTelemetry(data, csEventOptions);
+  }
+}
+
 /** Get queued events (useful for testing or delayed SDK init). */
 export function getQueuedEvents(): TelemetryEvent[] {
   return [...eventQueue];

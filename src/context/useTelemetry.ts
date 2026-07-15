@@ -15,6 +15,7 @@ import {
   raiseEndEvent,
   raiseSummaryEvent,
   raiseErrorEvent,
+  raiseResponseEvent,
 } from '../services/telemetry-service';
 
 export function useTelemetry() {
@@ -126,6 +127,28 @@ export function useTelemetry() {
     });
   }, []);
 
+  /**
+   * Log the final response value for a question being LEFT via navigation.
+   *
+   * Angular parity (viewer-service.ts:raiseResponseEvent, called from
+   * section-player.component.ts:346's nextSlide() — NOT from the option-select
+   * handler). This fires once per question, when the learner navigates away
+   * from it (Next/jump), using whatever was last selected — distinct from
+   * ASSESS (fired immediately on answering) and INTERACT (fired on every
+   * option click). `option` is undefined when the question was left
+   * unanswered (Angular: `currentOptionSelected?.option ? ... : undefined`).
+   */
+  const logResponse = useCallback(
+    (questionId: string, qType: string | undefined, option: unknown) => {
+      raiseResponseEvent({
+        target: { id: questionId, ver: '1.0', type: qType || '' },
+        type: 'CHOOSE',
+        values: [{ option }],
+      });
+    },
+    [],
+  );
+
   return {
     logOptionSelected,
     logAnswerSubmitted,
@@ -134,5 +157,6 @@ export function useTelemetry() {
     logAssessmentEnd,
     logSummary,
     logError,
+    logResponse,
   };
 }
