@@ -26,6 +26,14 @@ describe('useTelemetry', () => {
     expect(events[0].edata).toMatchObject({ id: 'A,B', questionId: 'q2' });
   });
 
+  it('logOptionSelected includes subtype/pageid (Angular parity: quml-library.service.ts interact())', () => {
+    const { result } = renderHook(() => useTelemetry());
+    act(() => result.current.logOptionSelected('q1', 'A', 2));
+
+    const events = getQueuedEvents();
+    expect(events[0].edata).toMatchObject({ subtype: '', pageid: '2' });
+  });
+
   it('logAnswerSubmitted queues an ASSESS event matching the Sunbird item/index/pass/resvalues shape', () => {
     const { result } = renderHook(() => useTelemetry());
     act(() =>
@@ -53,6 +61,26 @@ describe('useTelemetry', () => {
     expect(events[0].edata).toMatchObject({ pass: 'Yes', score: 2 });
   });
 
+  it('logAnswerSubmitted includes item.title/sectionId and the real duration (Angular parity: section-player.component.ts edataItem/slideDuration)', () => {
+    const { result } = renderHook(() => useTelemetry());
+    act(() =>
+      result.current.logAnswerSubmitted(
+        { identifier: 'q5', qType: 'MCQ', name: 'What is 2+2?' },
+        1,
+        ['A'],
+        1,
+        1,
+        { sectionId: 's1', durationSec: 3.5 },
+      ),
+    );
+
+    const events = getQueuedEvents();
+    expect(events[0].edata).toMatchObject({
+      item: { id: 'q5', title: 'What is 2+2?', sectionId: 's1' },
+      duration: 3.5,
+    });
+  });
+
   it('logPageViewed queues an IMPRESSION event', () => {
     const { result } = renderHook(() => useTelemetry());
     act(() => result.current.logPageViewed('start'));
@@ -61,6 +89,14 @@ describe('useTelemetry', () => {
     expect(events).toHaveLength(1);
     expect(events[0].eid).toBe('IMPRESSION');
     expect(events[0].edata).toMatchObject({ pageId: 'start' });
+  });
+
+  it('logPageViewed includes type/subtype/uri/pageid (Angular parity: quml-library.service.ts impression())', () => {
+    const { result } = renderHook(() => useTelemetry());
+    act(() => result.current.logPageViewed('question', 1));
+
+    const events = getQueuedEvents();
+    expect(events[0].edata).toMatchObject({ type: 'workflow', subtype: '', uri: '', pageid: '1' });
   });
 
   it('logAssessmentStart queues a START event with duration in seconds', () => {
@@ -73,34 +109,51 @@ describe('useTelemetry', () => {
     expect(events[0].edata).toMatchObject({ type: 'content', mode: 'play', duration: 1.5 });
   });
 
-  it('logAssessmentEnd queues an END event with page/duration info', () => {
+  it('logAssessmentEnd queues an END event with a summary array (Angular parity: consumed by the portal\'s calculateContentProgress)', () => {
     const { result } = renderHook(() => useTelemetry());
-    act(() => result.current.logAssessmentEnd(3, 5, 2000));
+    act(() => result.current.logAssessmentEnd(3, 5, 2000, 4));
 
     const events = getQueuedEvents();
     expect(events).toHaveLength(1);
     expect(events[0].eid).toBe('END');
     expect(events[0].edata).toMatchObject({
-      currentPage: 3,
-      totalPages: 5,
+      pageid: 'sunbird-player-Endpage',
+      summary: [
+        { progress: 60 },
+        { totalNoofQuestions: 5 },
+        { visitedQuestions: 5 },
+        { endpageseen: true },
+        { score: 4 },
+      ],
       duration: 2,
     });
   });
 
-  it('logSummary queues a SUMMARY event with the correct/incorrect/partial/score breakdown', () => {
+  it('logSummary queues a SUMMARY event with the correct/incorrect/partial/skipped/score breakdown', () => {
     const { result } = renderHook(() => useTelemetry());
-    act(() => result.current.logSummary({ correct: 2, wrong: 1, partial: 0, score: 2 }));
+    const starttime = Date.now() - 5000;
+    act(() =>
+      result.current.logSummary(
+        { correct: 2, wrong: 1, partial: 0, skipped: 1, score: 2 },
+        { currentQuestionIndex: 4, totalQuestions: 4, starttime },
+      ),
+    );
 
     const events = getQueuedEvents();
     expect(events).toHaveLength(1);
     expect(events[0].eid).toBe('SUMMARY');
     expect(events[0].edata).toMatchObject({
+      starttime,
       interactions: 3,
+      pageviews: 4,
       extra: [
+        { id: 'progress', value: '100' },
+        { id: 'endpageseen', value: 'true' },
         { id: 'score', value: '2' },
         { id: 'correct', value: '2' },
         { id: 'incorrect', value: '1' },
         { id: 'partial', value: '0' },
+        { id: 'skipped', value: '1' },
       ],
     });
   });

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { QumlProvider } from '../../context/QumlContext';
 import { MainPlayer } from './MainPlayer';
@@ -121,5 +121,58 @@ describe('MainPlayer — telemetry lifecycle (Angular parity)', () => {
     expect(received.filter((e) => e.eid === 'START').length).toBe(1);
 
     unsub();
+  });
+
+  it('END carries a summary array with a progress key (Angular parity: consumed by the portal\'s calculateContentProgress for course-completion tracking)', () => {
+    const cfg: PlayerConfig = {
+      context: {},
+      config: { language: 'en' },
+      data: baseData,
+    };
+    clearEventQueue();
+    const received: { eid: string; edata: any }[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e));
+
+    render(
+      <QumlProvider playerConfig={cfg}>
+        <MainPlayer playerConfig={cfg} />
+      </QumlProvider>,
+    );
+
+    enterAssessment();
+    submitAssessment();
+
+    const end = received.find((e) => e.eid === 'END');
+    expect(end?.edata.summary).toEqual(
+      expect.arrayContaining([{ progress: 100 }, { endpageseen: true }]),
+    );
+
+    unsub();
+  });
+
+  it('emits a QUML_SUMMARY onPlayerEvent on submit (Angular parity: viewer-service raiseSummaryEvent → qumlPlayerEvent.emit) — required by the portal\'s course-completion tracking', () => {
+    const onPlayerEvent = vi.fn();
+    const cfg: PlayerConfig = {
+      context: {},
+      config: { language: 'en' },
+      data: baseData,
+    };
+    render(
+      <QumlProvider playerConfig={cfg}>
+        <MainPlayer playerConfig={cfg} onPlayerEvent={onPlayerEvent} />
+      </QumlProvider>,
+    );
+
+    enterAssessment();
+    submitAssessment();
+
+    expect(onPlayerEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eid: 'QUML_SUMMARY',
+        edata: expect.objectContaining({
+          extra: expect.arrayContaining([{ id: 'endpageseen', value: 'true' }]),
+        }),
+      }),
+    );
   });
 });

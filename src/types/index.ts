@@ -169,6 +169,8 @@ export interface TelemetryContext {
   pdata?: { id: string; ver: string; pid?: string };
   host?: string;
   threshold?: number;
+  /** The questionset/content id — matches the portal's telemetryContextBuilder.ts naming. */
+  contentId?: string;
   [key: string]: unknown;
 }
 

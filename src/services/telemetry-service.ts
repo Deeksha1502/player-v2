@@ -142,9 +142,15 @@ function initializeCsSdk(context: TelemetryContext): void {
 
   csEventOptions = {
     object: {
-      id: (context.identifier as string) || '',
+      // Portal's telemetryContextBuilder.ts names this field `contentId`, not
+      // `identifier` — reading the wrong key here silently left object.id
+      // empty on every event (START/ASSESS/END/etc), not just END.
+      id: (context.contentId as string) || '',
       type: 'Content',
-      ver: (context.pkgVersion as string) || '',
+      // pkgVersion is a number in raw content metadata (Angular parity:
+      // quml-library.service.ts reads parentConfig.metadata.pkgVersion, not
+      // telemetry context) — stringify rather than assume a string.
+      ver: context.pkgVersion != null ? String(context.pkgVersion) : '',
       rollup: context.objectRollup || {},
     },
     context: {
@@ -154,7 +160,9 @@ function initializeCsSdk(context: TelemetryContext): void {
       sid: context.sid,
       uid: context.uid,
       cdata,
-      rollup: context.rollup || {},
+      // Portal's telemetryContextBuilder.ts names this field `contextRollup`,
+      // not `rollup` — same field-name mismatch class as object.id/contentId.
+      rollup: (context.contextRollup as Record<string, string>) || {},
     },
   };
 

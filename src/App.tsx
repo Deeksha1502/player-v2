@@ -47,8 +47,13 @@ function App() {
   // directly (no web component wrapper), so without this, `npm run dev` never
   // initializes telemetry and every raise* call silently no-ops.
   useEffect(() => {
-    initializeTelemetry(playerConfig.context);
-  }, [playerConfig.context]);
+    // pkgVersion lives on content metadata (Angular parity), not telemetry
+    // context — merge it in so object.ver isn't silently empty.
+    initializeTelemetry({
+      ...playerConfig.context,
+      pkgVersion: (playerConfig.metadata as Record<string, unknown> | undefined)?.pkgVersion,
+    });
+  }, [playerConfig.context, playerConfig.metadata]);
 
   return (
     <QumlProvider playerConfig={playerConfig}>

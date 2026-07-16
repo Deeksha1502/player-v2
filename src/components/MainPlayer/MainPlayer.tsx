@@ -96,7 +96,8 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   // initializer only runs once, on first render, so this is effectively
   // "player mounted at".
   const playerMountedAtRef = useRef<number>(Date.now());
-  const { logAssessmentStart, logAssessmentEnd, logSummary } = useTelemetry();
+  const { logInteraction, logAssessmentStart, logAssessmentEnd, logSummary, logError } =
+    useTelemetry();
 
   // Section intros can be disabled via config (spec §6.0).
   const sectionIntrosEnabled =
@@ -220,8 +221,13 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
       const message =
         err instanceof QumlApiError ? err.message : 'Failed to load the assessment.';
       setError(message);
+      // Angular parity (section-player.component.ts's content-load-failure /
+      // no-internet paths raising an ERROR telemetry event) — old raised this
+      // for every surfaced load failure; the new player previously only showed
+      // it in the UI, telemetry never saw it.
+      logError(err instanceof Error ? err : new Error(message));
     }
-  }, [playerConfig, setPlayerConfig, setSections, setLoading, setError, setAttempt]);
+  }, [playerConfig, setPlayerConfig, setSections, setLoading, setError, setAttempt, logError]);
 
   useEffect(() => {
     initializeFromConfig();
@@ -441,16 +447,39 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   };
 
   const handleConfirmSubmit = () => {
+    // Angular parity (main-player.component.ts:506, eventName.scoreBoardSubmitClicked).
+    logInteraction('score_board_submit_clicked');
     setSubmitDialog(false);
     setStage('results');
     onPlayerEvent?.({ type: 'quizEnd', summary });
     const durationMs = telemetryStartRef.current != null ? Date.now() - telemetryStartRef.current : 0;
-    logAssessmentEnd(globalQuestionNumber, overview.totalQuestions, durationMs);
-    logSummary({
-      correct: summary.correct,
-      wrong: summary.incorrect,
-      partial: summary.partial,
-      score: summary.totalScore,
+    const starttime = telemetryStartRef.current ?? Date.now();
+    logAssessmentEnd(globalQuestionNumber, overview.totalQuestions, durationMs, summary.totalScore);
+    logSummary(
+      {
+        correct: summary.correct,
+        wrong: summary.incorrect,
+        partial: summary.partial,
+        skipped: summary.skipped,
+        score: summary.totalScore,
+      },
+      { currentQuestionIndex: globalQuestionNumber, totalQuestions: overview.totalQuestions, starttime },
+    );
+    // Angular parity (viewer-service.ts raiseSummaryEvent → qumlPlayerEvent.emit
+    // with eid:'QUML_SUMMARY') — the portal's course-completion tracking
+    // (playerEventNormalizer.ts → useContentStateUpdate) keys off this exact
+    // onPlayerEvent shape to mark a QuestionSet attempt complete. Without it,
+    // progress never advances for QuestionSet content played inside a course.
+    onPlayerEvent?.({
+      eid: 'QUML_SUMMARY',
+      ets: starttime,
+      edata: {
+        starttime,
+        extra: [
+          { id: 'score', value: summary.totalScore.toString() },
+          { id: 'endpageseen', value: 'true' },
+        ],
+      },
     });
     // Angular parity (main-player.component.ts:483-485 raiseEndEvent) — flag
     // to the host that this attempt, now finished, was the last one allowed.
@@ -470,6 +499,8 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   const handleCancelSubmit = () => setSubmitDialog(false);
 
   const handleReviewAll = () => {
+    // Angular parity (scoreboard.component.ts:57, eventName.scoreBoardReviewClicked).
+    logInteraction('score_board_review_clicked');
     setReviewStartIndex(0);
     setStage('review');
   };
@@ -478,6 +509,8 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   // config prop (resetState wipes config/sections), bump the attempt, return to
   // Overview, and reset the shell timer.
   const handleRetake = () => {
+    // Angular parity (main-player.component.ts:418, eventName.replayClicked).
+    logInteraction('replay_clicked');
     const nextAttempt = state.attemptNumber + 1;
     resetState();
     initializeFromConfig();
@@ -506,6 +539,8 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   };
 
   const handleSectionJump = (index: number) => {
+    // Angular parity (section-player.component.ts:898, eventName.goToQuestion).
+    logInteraction('go_to_question', index);
     setCurrentSection(index);
     setCurrentQuestion(0);
     setStage('assessment');
