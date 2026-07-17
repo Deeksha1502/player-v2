@@ -326,11 +326,11 @@
   @include m.focus-ring($color: v.$g700);
 
   flex-shrink: 0;
-  background: v.$dark;
+  background: var(--qp-primary);
   color: v.$white;
 
   &:hover:not(:disabled) {
-    background: v.$g800;
+    background: var(--qp-primary-hover);
   }
 
   @include m.mobile {
