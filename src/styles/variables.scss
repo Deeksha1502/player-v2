@@ -101,3 +101,4 @@ $header-h:   4rem;
 $bp-mobile:  768px;
 $bp-tablet:  1024px; // tablet/laptop boundary — ≤1023px is "tablet and below"
 $bp-short-height: 720px; // landscape-phone height boundary — see m.short
+$bp-short-width:  950px; // landscape-phone width ceiling — gates m.compact's short-height branch (see mixins.scss) so a merely-unmaximized desktop window (short but wide) isn't mistaken for a real device in landscape

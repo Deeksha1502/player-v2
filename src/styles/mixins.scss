@@ -56,11 +56,18 @@
 // should be mobile-app-only and must NOT show up on desktop/portal/editor at
 // any orientation. `@container` and `@media` can't be OR'd in one rule, so
 // this just repeats @content under each condition.
+//
+// The short-height branch ALSO requires a narrow viewport width (unlike the
+// standalone `short` mixin above) — a short-but-WIDE window is just a desktop
+// browser that isn't maximized, not a real device in landscape. A genuine
+// phone/tablet in landscape is short AND comfortably under desktop width, so
+// this doesn't affect real mobile-landscape detection; it only excludes
+// resized-but-wide desktop windows from being mistaken for one.
 @mixin compact {
   @include mobile {
     @content;
   }
-  @include short {
+  @media (max-height: #{v.$bp-short-height}) and (max-width: #{v.$bp-short-width}) {
     @content;
   }
 }
