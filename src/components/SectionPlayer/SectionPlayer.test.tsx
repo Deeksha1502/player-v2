@@ -123,6 +123,20 @@ describe('SectionPlayer', () => {
     );
   });
 
+  it('regression: resvalues wraps the selected value in an object, never a bare primitive', () => {
+    // The backend's AssessmentParser.getListValues casts every resvalues
+    // element to a Map — a bare MCQ option index (e.g. resvalues:[0]) throws
+    // a ClassCastException there that silently drops the whole assessment
+    // submission, not just this question.
+    logAnswerSubmitted.mockClear();
+    wrap(<SectionPlayer section={section} />);
+    fireEvent.click(screen.getAllByRole('radio')[0]);
+    const resvalues = logAnswerSubmitted.mock.calls[0][2];
+    expect(Array.isArray(resvalues)).toBe(true);
+    expect(typeof resvalues[0]).toBe('object');
+    expect(resvalues[0]).not.toBeNull();
+  });
+
   it('RESPONSE fires on Next for the question being left, with its selected option', () => {
     vi.useFakeTimers();
     try {
