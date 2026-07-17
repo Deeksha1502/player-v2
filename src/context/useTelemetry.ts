@@ -19,14 +19,40 @@ import {
 } from '../services/telemetry-service';
 
 export function useTelemetry() {
-  /** Log when a user selects an option/answer. */
-  const logOptionSelected = useCallback((questionId: string, answer: string | string[]) => {
+  /**
+   * Log a generic named interaction (Angular parity: viewer-service.ts's
+   * raiseHeartBeatEvent(eventName.*, TelemetryType.interact, pageIndex) →
+   * quml-library.service.ts's interact(id, currentPage), which always sends
+   * `{type:'TOUCH', subtype:'', id, pageid}`). Use for button/action clicks
+   * that aren't answer-selection (which has its own richer logOptionSelected
+   * shape) — e.g. prev/next nav, hint/solution toggles, replay, review, zoom.
+   */
+  const logInteraction = useCallback((id: string, pageIndex?: number) => {
     raiseInteractEvent({
-      type: 'CHOOSE',
-      id: Array.isArray(answer) ? answer.join(',') : String(answer),
-      questionId,
+      type: 'TOUCH',
+      subtype: '',
+      id,
+      pageid: pageIndex != null ? String(pageIndex) : '',
     });
   }, []);
+
+  /** Log when a user selects an option/answer. */
+  const logOptionSelected = useCallback(
+    (questionId: string, answer: string | string[], pageIndex?: number) => {
+      raiseInteractEvent({
+        // Angular parity (quml-library.service.ts's interact()) — old always
+        // sends type:'TOUCH' for this INTERACT, regardless of the answer
+        // value; id/questionId here carry more signal than old's generic
+        // 'option_clicked', so kept as-is, but type matches old exactly.
+        type: 'TOUCH',
+        id: Array.isArray(answer) ? answer.join(',') : String(answer),
+        questionId,
+        subtype: '',
+        pageid: pageIndex != null ? String(pageIndex) : '',
+      });
+    },
+    [],
+  );
 
   /**
    * Log when an answer is scored/submitted.
@@ -39,40 +65,52 @@ export function useTelemetry() {
    * `edata` with no reshaping, so whatever we send here IS the wire payload
    * that progress/scoring processing reads.
    *
-   * `item` is intentionally a reduced version of Angular's `edataItem`
-   * (id/type/maxscore only, no title/desc/params) — those extra fields are
-   * descriptive metadata only; id+type+maxscore+score+pass+index carry the
-   * signal progress/scoring actually needs. `duration` defaults to 0 — this
-   * project doesn't yet track per-question view duration (Angular's
-   * `slideDuration`); revisit if that field turns out to matter downstream.
+   * `item` still omits `desc`/`params` — `desc` isn't in this project's Question
+   * model at all (transformation-service never captures it), and `params` is a
+   * per-question-type interaction descriptor old computed bespoke per type;
+   * both need a dedicated pass, not a quick add here. `title` and `sectionId`
+   * ARE available and restored below (Angular parity). `duration` is now the
+   * real time spent on the question (caller-supplied), not hardcoded 0.
    */
   const logAnswerSubmitted = useCallback(
     (
-      question: { identifier: string; qType?: string; primaryCategory?: string },
+      question: { identifier: string; qType?: string; primaryCategory?: string; name?: string },
       index: number,
       resvalues: unknown[],
       score: number,
       maxScore = 1,
+      options?: { sectionId?: string; durationSec?: number },
     ) => {
       raiseAssessEvent({
         item: {
           id: question.identifier,
+          title: question.name ?? '',
           type: (question.qType || question.primaryCategory || '').toLowerCase(),
           maxscore: maxScore,
+          ...(options?.sectionId ? { sectionId: options.sectionId } : {}),
         },
         index,
         pass: score >= maxScore ? 'Yes' : 'No',
         score,
         resvalues,
-        duration: 0,
+        duration: options?.durationSec ?? 0,
       });
     },
     [],
   );
 
   /** Log when a page/section is viewed. */
-  const logPageViewed = useCallback((pageId: string) => {
-    raiseImpressionEvent({ pageId });
+  const logPageViewed = useCallback((pageId: string, pageIndex?: number) => {
+    raiseImpressionEvent({
+      pageId,
+      // Angular parity (quml-library.service.ts's impression()) — restored
+      // additively alongside the more descriptive `pageId` this player already
+      // sends.
+      type: 'workflow',
+      subtype: '',
+      uri: '',
+      pageid: pageIndex != null ? String(pageIndex) : '',
+    });
   }, []);
 
   /** Log when the assessment actually begins (Angular parity: viewer-service raiseStartEvent). */
@@ -85,15 +123,38 @@ export function useTelemetry() {
     });
   }, []);
 
-  /** Log when the assessment is submitted (Angular parity: viewer-service raiseEndEvent). */
+  /**
+   * Log when the assessment is submitted (Angular parity: viewer-service
+   * raiseEndEvent → quml-library.service.ts's end()). The wire edata carries a
+   * `summary` array — the portal's calculateContentProgress (course-completion
+   * tracking) merges this array and reads its `progress` key; the previous
+   * `currentPage`/`totalPages` shape had no `progress` key at all, so progress
+   * always resolved to 0 for QuestionSet content played inside a course.
+   */
   const logAssessmentEnd = useCallback(
-    (currentQuestionIndex: number, totalQuestions: number, durationMs: number) => {
+    (currentQuestionIndex: number, totalQuestions: number, durationMs: number, score: number) => {
       raiseEndEvent({
         type: 'content',
         mode: 'play',
         pageid: 'sunbird-player-Endpage',
-        currentPage: currentQuestionIndex,
-        totalPages: totalQuestions,
+        summary: [
+          {
+            progress:
+              totalQuestions > 0
+                ? Number(((currentQuestionIndex / totalQuestions) * 100).toFixed(0))
+                : 0,
+          },
+          { totalNoofQuestions: totalQuestions },
+          // NOT totalQuestions: old player's own end() call hardcodes this to
+          // totalNumberOfQuestions too, but that's harmless there only because
+          // Angular's UI never reaches END before visiting every question. This
+          // player's header Submit is clickable from question 1 (no gating —
+          // PlayerHeader.tsx), so hardcoding here would make `visitedQuestions`
+          // silently disagree with `progress` above on an early submit.
+          { visitedQuestions: currentQuestionIndex },
+          { endpageseen: true },
+          { score },
+        ],
         duration: Number((durationMs / 1e3).toFixed(2)),
       });
     },
@@ -102,16 +163,38 @@ export function useTelemetry() {
 
   /** Log the final score/summary breakdown (Angular parity: viewer-service raiseSummaryEvent). */
   const logSummary = useCallback(
-    (summary: { correct: number; wrong: number; partial: number; score: number }) => {
+    (
+      summary: { correct: number; wrong: number; partial: number; skipped: number; score: number },
+      meta: { currentQuestionIndex: number; totalQuestions: number; starttime: number },
+    ) => {
+      const endtime = Date.now();
       raiseSummaryEvent({
         type: 'content',
         mode: 'play',
+        starttime: meta.starttime,
+        endtime,
+        // Angular parity intentionally NOT replicated: viewer-service.ts computes
+        // this as `(elapsed % 60000) / 1000`, which wraps every 60s and reports a
+        // wrong, much smaller value for any assessment over a minute long — a bug
+        // in the old player, not a contract worth reproducing. Send real elapsed
+        // seconds instead.
+        timespent: Number(((endtime - meta.starttime) / 1000).toFixed(2)),
+        pageviews: meta.totalQuestions,
         interactions: summary.correct + summary.wrong + summary.partial,
         extra: [
+          {
+            id: 'progress',
+            value:
+              meta.totalQuestions > 0
+                ? ((meta.currentQuestionIndex / meta.totalQuestions) * 100).toFixed(0)
+                : '0',
+          },
+          { id: 'endpageseen', value: 'true' },
           { id: 'score', value: summary.score.toString() },
           { id: 'correct', value: summary.correct.toString() },
           { id: 'incorrect', value: summary.wrong.toString() },
           { id: 'partial', value: summary.partial.toString() },
+          { id: 'skipped', value: summary.skipped.toString() },
         ],
       });
     },
@@ -150,6 +233,7 @@ export function useTelemetry() {
   );
 
   return {
+    logInteraction,
     logOptionSelected,
     logAnswerSubmitted,
     logPageViewed,

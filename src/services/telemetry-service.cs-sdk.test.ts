@@ -218,6 +218,17 @@ describe('telemetry-service — CS SDK integration', () => {
     expect(raiseInteractTelemetry).not.toHaveBeenCalled();
   });
 
+  it('regression: object.id comes from context.contentId (portal\'s field name), not context.identifier', () => {
+    // The portal's telemetryContextBuilder.ts sets `contentId`, never
+    // `identifier` — reading the wrong key here silently left object.id
+    // empty on every event in production.
+    initializeTelemetry({ ...fullContext, contentId: 'do_123' } as any);
+    raiseStartEvent({ type: 'content', mode: 'play' });
+
+    const arg = raiseStartTelemetry.mock.calls[0][0];
+    expect(arg.options.object).toMatchObject({ id: 'do_123' });
+  });
+
   it('regression: does not call the bridge SDK.initialize(context) directly when the CS SDK is active', () => {
     // Reproduces the real-world bug: a bare `sdk.initialize(rawContext)` call
     // racing CsTelemetryModule's own async initTelemetry(fullTelemetryConfig)

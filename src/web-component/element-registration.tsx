@@ -51,7 +51,12 @@ class SunbirdQumlPlayer extends HTMLElement {
       //    needs no service-level init).
       try {
         if (playerConfig.context) {
-          initializeTelemetry(playerConfig.context);
+          // pkgVersion lives on content metadata (Angular parity), not
+          // telemetry context — merge it in so object.ver isn't silently empty.
+          initializeTelemetry({
+            ...playerConfig.context,
+            pkgVersion: (playerConfig.metadata as Record<string, unknown> | undefined)?.pkgVersion,
+          });
         }
       } catch (initError) {
         console.error('[SunbirdQumlPlayer] Telemetry initialization error:', initError);

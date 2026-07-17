@@ -41,7 +41,8 @@ interface SectionPlayerProps {
 
 export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: SectionPlayerProps) {
   const { state, storeAnswer, setCurrentQuestion } = useQuml();
-  const { logOptionSelected, logAnswerSubmitted, logPageViewed, logResponse } = useTelemetry();
+  const { logInteraction, logOptionSelected, logAnswerSubmitted, logPageViewed, logResponse } =
+    useTelemetry();
   const language = state.language;
 
   const questions: Question[] = section?.children ?? [];
@@ -64,8 +65,15 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
   // Angular parity (viewer-service raiseHeartBeatEvent 'impression') — one
   // IMPRESSION per question view.
   useEffect(() => {
-    logPageViewed(pageId.QUESTION_PAGE);
+    logPageViewed(pageId.QUESTION_PAGE, externalIndex);
   }, [externalIndex, logPageViewed]);
+
+  // Angular parity (section-player.component.ts's slideDuration) — how long the
+  // learner has been on the current question, for ASSESS's `duration` field.
+  const slideEnteredAtRef = useRef(Date.now());
+  useEffect(() => {
+    slideEnteredAtRef.current = Date.now();
+  }, [currentSlide]);
 
   // Feedback dwell: how long the Correct/Wrong toast stays on the current
   // question before auto-advancing (see proceedWithFeedback).
@@ -98,7 +106,7 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
 
     const selected =
       answer.value ?? answer.order ?? answer.responses ?? answer.matches;
-    logOptionSelected(currentQuestion.identifier, selected as string | string[]);
+    logOptionSelected(currentQuestion.identifier, selected as string | string[], currentSlide);
 
     // An empty response (e.g. everything de-selected, a cleared blank) is not an
     // attempt: skip the ASSESS event so it isn't counted or scored.
@@ -111,12 +119,14 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
     const earned = calculateScore(currentQuestion, answer, language) * maxScore;
     // Angular parity: index is 1-based within the section (currentIndex + 1);
     // resvalues wraps the selected value(s) as an array (section-player.component.ts's `[option.option]`).
+    const durationSec = Number(((Date.now() - slideEnteredAtRef.current) / 1000).toFixed(2));
     logAnswerSubmitted(
       currentQuestion,
       currentSlide + 1,
       Array.isArray(selected) ? selected : [selected],
       earned,
       maxScore,
+      { sectionId: section?.identifier, durationSec },
     );
   };
 
@@ -186,11 +196,17 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
         ? (leavingAnswer.value ?? leavingAnswer.order ?? leavingAnswer.responses ?? leavingAnswer.matches)
         : undefined;
       logResponse(leavingQuestion.identifier, leavingQuestion.qType, option);
+      // Angular parity (section-player.component.ts:329, eventName.nextClicked).
+      logInteraction('next_clicked', currentSlide + 1);
       goTo(currentSlide + 1);
     });
   };
   const handlePrevious = () => {
-    if (currentSlide > 0) goTo(currentSlide - 1);
+    if (currentSlide > 0) {
+      // Angular parity (section-player.component.ts:373, eventName.prevClicked).
+      logInteraction('prev_clicked', currentSlide - 1);
+      goTo(currentSlide - 1);
+    }
   };
   const handleSubmit = () => {
     proceedWithFeedback(() => onSectionEnd?.());
@@ -294,6 +310,7 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
             showSolutions={section?.showSolutions}
             language={language}
             mediaCtx={mediaCtx}
+            pageIndex={currentSlide}
           />
         </QuestionCard>
       </div>
