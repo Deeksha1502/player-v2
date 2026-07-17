@@ -118,12 +118,20 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
     const maxScore = currentQuestion.maxScore ?? 1;
     const earned = calculateScore(currentQuestion, answer, language) * maxScore;
     // Angular parity: index is 1-based within the section (currentIndex + 1);
-    // resvalues wraps the selected value(s) as an array (section-player.component.ts's `[option.option]`).
+    // resvalues wraps the selected value(s) as a one-element array
+    // (section-player.component.ts's `[option.option]`) — critically, that
+    // element must be an OBJECT. The backend's AssessmentParser.getListValues
+    // (lern-service) unconditionally does `res.asScala` on every resvalues
+    // element, assuming it's a Map; a bare primitive (e.g. MCQ's raw option
+    // index) throws a ClassCastException that aborts the WHOLE event list for
+    // that submission — silently dropping the entire assessment, not just one
+    // question. Wrapping in {value: selected} guarantees a Map regardless of
+    // question type (MCQ's number, SEQ/REO's array, FTB/MTF's object).
     const durationSec = Number(((Date.now() - slideEnteredAtRef.current) / 1000).toFixed(2));
     logAnswerSubmitted(
       currentQuestion,
       currentSlide + 1,
-      Array.isArray(selected) ? selected : [selected],
+      [{ value: selected }],
       earned,
       maxScore,
       { sectionId: section?.identifier, durationSec },
