@@ -40,12 +40,13 @@ export function useTelemetry() {
   const logOptionSelected = useCallback(
     (questionId: string, answer: string | string[], pageIndex?: number) => {
       raiseInteractEvent({
-        type: 'CHOOSE',
+        // Angular parity (quml-library.service.ts's interact()) — old always
+        // sends type:'TOUCH' for this INTERACT, regardless of the answer
+        // value; id/questionId here carry more signal than old's generic
+        // 'option_clicked', so kept as-is, but type matches old exactly.
+        type: 'TOUCH',
         id: Array.isArray(answer) ? answer.join(',') : String(answer),
         questionId,
-        // Angular parity (quml-library.service.ts's interact()) — old always
-        // sends these two fields; restored additively (id/questionId here carry
-        // more signal than old's generic 'option_clicked', so kept as-is).
         subtype: '',
         pageid: pageIndex != null ? String(pageIndex) : '',
       });

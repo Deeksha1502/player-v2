@@ -15,7 +15,7 @@ describe('useTelemetry', () => {
     const events = getQueuedEvents();
     expect(events).toHaveLength(1);
     expect(events[0].eid).toBe('INTERACT');
-    expect(events[0].edata).toMatchObject({ type: 'CHOOSE', id: 'A', questionId: 'q1' });
+    expect(events[0].edata).toMatchObject({ type: 'TOUCH', id: 'A', questionId: 'q1' });
   });
 
   it('logOptionSelected joins array answers', () => {
