@@ -27,6 +27,20 @@ export function McqQuestion({
     media: mediaCtx?.media ?? (question.media as MediaItem[] | undefined),
   };
 
+  // Editor-authored option layout. Current editor-v2 serializes grid layout
+  // as templateId 'mcq-grid' (question.store.ts:74, useSaveQuestion.ts:458),
+  // but content authored/saved by the old Angular editor uses 'mcq-vertical-split'
+  // for the same "Grid" layout — both values exist in real content, so match
+  // either. 'vertical' (or no templateId) is the existing default, single-column
+  // list.
+  const templateId = question.templateId as string | undefined;
+  const layoutClass =
+    templateId?.endsWith('-grid') || templateId?.endsWith('-vertical-split')
+      ? styles.grid
+      : templateId?.endsWith('-horizontal')
+        ? styles.horizontal
+        : '';
+
   const [selected, setSelected] = useState<number | string | null>(null);
   const loadedRef = useRef(false);
 
@@ -51,7 +65,11 @@ export function McqQuestion({
     <div className={styles.mcq}>
       <QuestionBody question={question} language={language} mediaCtx={ctx} />
 
-      <div className={styles.options} role="radiogroup" aria-label="Answer options">
+      <div
+        className={`${styles.options} ${layoutClass}`.trim()}
+        role="radiogroup"
+        aria-label="Answer options"
+      >
         {options.map((opt, index) => {
           const isSelected = selected === opt.value;
           return (

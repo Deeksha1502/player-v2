@@ -10,6 +10,21 @@
   gap: v.$space-3;
 }
 
+// Editor-authored layout (question.templateId === 'seq-horizontal').
+.horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  .row {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  @include m.mobile {
+    flex-direction: column;
+  }
+}
+
 // The whole row is the drag handle. The dnd-kit TouchSensor press-delay (150ms)
 // disambiguates a drag from a scroll, so we DON'T set touch-action:none (that
 // would block page scrolling) — same setup as the MTF draggable. cursor:grab is

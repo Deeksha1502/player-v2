@@ -13,6 +13,27 @@
   gap: v.$space-3;
 }
 
+// Editor-authored layout (question.templateId: mcq-vertical/-grid/-horizontal).
+// `.options` above stays the vertical (default) case.
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  @include m.mobile {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  .option {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
 .option {
   @include m.focus-ring;
 
