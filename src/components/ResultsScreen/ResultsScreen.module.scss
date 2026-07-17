@@ -7,7 +7,7 @@
   min-height: 100%;
   padding: v.$space-10 v.$space-6;
   background: v.$cream-bg;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 
   @include m.short {
     padding: v.$space-3;
@@ -19,7 +19,7 @@
   max-width: 560px;
   padding: v.$space-10 v.$space-8;
   background: v.$ivory;
-  border-radius: v.$r-lg;
+  border-radius: var(--qp-r-lg);
   box-shadow: v.$shadow-card;
   text-align: center;
 
@@ -70,11 +70,11 @@
   @include m.button-base;
   @include m.focus-ring($color: v.$g700);
 
-  background: v.$dark;
+  background: var(--qp-primary);
   color: v.$white;
 
   &:hover:not(:disabled) {
-    background: v.$g800;
+    background: var(--qp-primary-hover);
   }
 
   @include m.short {

@@ -42,7 +42,7 @@
   background: none;
   border: none;
   color: v.$gray-500;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;
   cursor: pointer;
@@ -65,7 +65,7 @@
     height: 2.25rem;
     margin-bottom: 0;
     padding: 0;
-    border-radius: v.$r-pill;
+    border-radius: var(--qp-r-pill);
     background: v.$white;
     box-shadow: v.$shadow-sm;
 
@@ -84,7 +84,7 @@
 .card {
   width: 100%;
   background: v.$white;
-  border-radius: v.$r-lg;
+  border-radius: var(--qp-r-lg);
   box-shadow: v.$shadow-lg;
   overflow: hidden;
 }
@@ -96,7 +96,7 @@
   align-items: center;
   gap: v.$space-5;
   padding: v.$space-10;
-  background: v.$brick;
+  background: var(--qp-primary);
   overflow: hidden;
 
   @include m.mobile {
@@ -122,7 +122,7 @@
   flex-shrink: 0;
   width: 4rem;
   height: 4rem;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   background: rgba(255, 255, 255, 0.22);
   color: v.$white;
   font-size: v.$text-2xl;
@@ -167,7 +167,7 @@
   right: -2rem;
   width: 11rem;
   height: 11rem;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   background: rgba(255, 255, 255, 0.10);
 
   @include m.short {
@@ -195,7 +195,7 @@
 .instructions {
   padding: v.$space-6;
   background: v.$cream-bg;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
 
   @include m.short {
     padding: v.$space-3;
@@ -249,17 +249,17 @@
   width: 100%;
   padding: v.$space-5;
   border: none;
-  border-radius: v.$r-md;
-  background: v.$dark;
+  border-radius: var(--qp-r-md);
+  background: var(--qp-primary);
   color: v.$white;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-md;
   font-weight: v.$fw-semibold;
   cursor: pointer;
   transition: background v.$dur-fast v.$ease-out;
 
   &:hover {
-    background: v.$g800;
+    background: var(--qp-primary-hover);
   }
 
   @include m.short {

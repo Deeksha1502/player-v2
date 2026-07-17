@@ -13,8 +13,8 @@
   flex-direction: column;
   gap: v.$space-4;
   padding: v.$space-5;
-  background: v.$brick;
-  border-radius: v.$r-lg;
+  background: var(--qp-primary);
+  border-radius: var(--qp-r-lg);
 }
 
 $mtf-row-height: 6.5rem;
@@ -39,7 +39,7 @@ $mtf-row-height: 6.5rem;
   height: $mtf-row-height;
   padding: v.$space-3;
   background: v.$white;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   box-sizing: border-box;
   text-align: center;
 }
@@ -65,11 +65,11 @@ $mtf-row-height: 6.5rem;
 
 .dragging {
   opacity: 0.45;
-  border-color: v.$brick;
+  border-color: var(--qp-primary);
 }
 
 .term {
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   color: v.$g700;
 

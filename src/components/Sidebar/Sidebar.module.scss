@@ -7,7 +7,7 @@
   padding: v.$space-6 v.$space-5;
   background: transparent;
   overflow-y: auto;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 
   @include m.mobile {
     width: 100%;
@@ -41,7 +41,7 @@
   width: 100%;
   padding: v.$space-5;
   border: 1.5px solid transparent;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   background: v.$white;
   box-shadow: v.$shadow-sm;
   text-align: start;
@@ -54,7 +54,7 @@
 }
 
 .active {
-  border-color: v.$brick;
+  border-color: var(--qp-primary);
   background: v.$ivory;
 }
 
@@ -67,7 +67,7 @@
   flex-shrink: 0;
   width: 2rem;
   height: 2rem;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   background: v.$g200;
   color: v.$gray-500;
   font-size: v.$text-sm;
@@ -81,14 +81,14 @@
     bottom: -1px;
     width: 0.5rem;
     height: 0.5rem;
-    border-radius: v.$r-pill;
+    border-radius: var(--qp-r-pill);
     background: v.$ginger;
     border: 1.5px solid v.$white;
   }
 }
 
 .badgeActive {
-  background: v.$brick;
+  background: var(--qp-primary);
   color: v.$white;
 
   &::after {

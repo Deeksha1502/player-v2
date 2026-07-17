@@ -53,10 +53,10 @@ describe('SectionIntro', () => {
     expect(screen.getByText(/all questions are mandatory/i)).toBeInTheDocument();
   });
 
-  it('emits onBegin from the Start section CTA', () => {
+  it('emits onBegin from the Start section CTA (button uses the real section name, not the letter)', () => {
     const onBegin = vi.fn();
     render(<SectionIntro section={section} sectionIndex={1} totalSections={3} onBegin={onBegin} />);
-    fireEvent.click(screen.getByRole('button', { name: /start section b/i }));
+    fireEvent.click(screen.getByRole('button', { name: /start section knowledge check/i }));
     expect(onBegin).toHaveBeenCalledTimes(1);
   });
 

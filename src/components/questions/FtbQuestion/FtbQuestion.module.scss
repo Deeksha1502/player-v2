@@ -29,12 +29,12 @@
   top: -16px;
   left: 50%;
   transform: translateX(-50%);
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: 10px;
   font-weight: v.$fw-bold;
-  color: v.$brick;
-  background: v.$brick-lt;
-  border-radius: v.$r-xxs;
+  color: var(--qp-primary);
+  background: var(--qp-primary-subtle);
+  border-radius: var(--qp-r-xxs);
   padding: 0 5px;
 }
 
@@ -43,19 +43,19 @@
   max-width: 100%;
   border: none;
   border-bottom: 2.5px solid v.$gray-300;
-  border-radius: v.$r-xxs v.$r-xxs 0 0;
+  border-radius: var(--qp-r-xxs) var(--qp-r-xxs) 0 0;
   padding: 2px v.$space-2 4px;
   background: rgba(0, 0, 0, 0.02);
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-base;
   font-weight: v.$fw-semibold;
-  color: v.$brick;
+  color: var(--qp-primary);
   text-align: center;
   outline: none;
   transition: border-color v.$dur-fast v.$ease-out, background v.$dur-fast v.$ease-out;
 
   &:focus-visible {
-    border-bottom-color: v.$brick;
+    border-bottom-color: var(--qp-primary);
   }
 
   &:disabled {
@@ -69,8 +69,8 @@
 }
 
 .filled {
-  border-bottom-color: v.$brick;
-  background: v.$brick-lt;
+  border-bottom-color: var(--qp-primary);
+  background: var(--qp-primary-subtle);
 }
 
 .fallbackBlanks {

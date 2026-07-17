@@ -23,18 +23,18 @@
   @include m.focus-ring;
 
   background: transparent;
-  color: v.$brick-shade;
-  border: 1.5px solid v.$brick;
+  color: var(--qp-primary-hover);
+  border: 1.5px solid var(--qp-primary);
 
   &:hover:not(:disabled) {
-    background: v.$brick-lt;
+    background: var(--qp-primary-subtle);
   }
 }
 
 .panel {
   padding: v.$space-5;
-  border-radius: v.$r-sm;
-  font-family: v.$ff-base;
+  border-radius: var(--qp-r-sm);
+  font-family: var(--qp-font-sans);
 }
 
 .hintPanel {

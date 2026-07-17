@@ -27,8 +27,8 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   background: v.$ivory;
-  border-top-left-radius: v.$r-lg;
-  border-top-right-radius: v.$r-lg;
+  border-top-left-radius: var(--qp-r-lg);
+  border-top-right-radius: var(--qp-r-lg);
   box-shadow: v.$shadow-lg;
   animation: sheet-up v.$dur-base v.$ease-out;
 }
@@ -40,7 +40,7 @@
   width: 2.25rem;
   height: 0.25rem;
   margin: v.$space-3 0 0;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   background: v.$gray-300;
   flex-shrink: 0;
 }
@@ -67,7 +67,7 @@
 }
 
 .panelTitle {
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-md;
   font-weight: v.$fw-semibold;
   color: v.$dark;
@@ -81,7 +81,7 @@
   justify-content: center;
   padding: v.$space-1;
   border: none;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   background: transparent;
   color: v.$g600;
   cursor: pointer;

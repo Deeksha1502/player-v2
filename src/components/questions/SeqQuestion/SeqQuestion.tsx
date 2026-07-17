@@ -12,6 +12,7 @@ import {
 import {
   SortableContext,
   arrayMove,
+  horizontalListSortingStrategy,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
@@ -93,6 +94,11 @@ export function SeqQuestion({
     [question.identifier], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
+  // Editor-authored layout (question.store.ts: layout 'vertical' | 'horizontal',
+  // serialized as templateId `seq-${layout}`). 'vertical' (or no templateId) is
+  // the existing default, single-column list.
+  const isHorizontal = question.templateId === 'seq-horizontal';
+
   const [items, setItems] = useState<Option[]>(() => {
     if (savedResponse?.order) {
       const byValue = new Map(options.map((o) => [o.value, o]));
@@ -140,8 +146,14 @@ export function SeqQuestion({
     <div className={styles.seqWrap}>
       <QuestionBody question={question} language={language} mediaCtx={ctx} />
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
-          <ol className={styles.seq} aria-label="Arrange in order">
+        <SortableContext
+          items={sortableIds}
+          strategy={isHorizontal ? horizontalListSortingStrategy : verticalListSortingStrategy}
+        >
+          <ol
+            className={`${styles.seq} ${isHorizontal ? styles.horizontal : ''}`.trim()}
+            aria-label="Arrange in order"
+          >
             {items.map((item, index) => (
               <SeqRow
                 key={String(item.value)}

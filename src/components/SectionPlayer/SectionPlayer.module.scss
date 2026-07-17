@@ -80,7 +80,7 @@
 }
 
 .counter {
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-medium;
   color: v.$g600;
@@ -136,7 +136,7 @@
     width: 2.25rem;
     height: 2.25rem;
     padding: 0;
-    border-radius: v.$r-pill;
+    border-radius: var(--qp-r-pill);
 
     // The base hover lift (translateY(-1px)) would fight the centering
     // transform above — keep the shadow/color feedback, drop the lift.
@@ -183,5 +183,5 @@
 .error {
   padding: v.$space-6;
   color: v.$danger;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 }
