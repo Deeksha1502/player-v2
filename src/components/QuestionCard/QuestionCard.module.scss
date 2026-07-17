@@ -6,7 +6,7 @@
   margin: 0 auto;
   padding: v.$space-8 v.$space-10;
   background: v.$ivory;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   box-shadow: v.$shadow-sm;
 
   @include m.mobile {
@@ -35,16 +35,16 @@
   display: inline-flex;
   align-items: center;
   padding: v.$space-1 v.$space-3;
-  border-radius: v.$r-pill;
-  font-family: v.$ff-base;
+  border-radius: var(--qp-r-pill);
+  font-family: var(--qp-font-sans);
   font-size: v.$text-xs;
   font-weight: v.$fw-semibold;
   text-transform: capitalize;
 }
 
 .category {
-  background: v.$brick-lt;
-  color: v.$brick-shade;
+  background: var(--qp-primary-subtle);
+  color: var(--qp-primary-hover);
 }
 
 .difficulty {
@@ -57,7 +57,7 @@
 // portal/editor keep the top-bar counter and never show this.
 .progress {
   display: none;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-xs;
   font-weight: v.$fw-semibold;
   color: v.$g400;

@@ -8,7 +8,7 @@
   overflow-x: hidden;
   padding: v.$space-10;
   background: v.$cream-bg;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 
   @include m.tablet {
     padding: v.$space-8;
@@ -44,7 +44,7 @@
   flex-shrink: 0;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   color: v.$white;
   font-size: v.$text-base;
   font-weight: v.$fw-bold;
@@ -139,7 +139,7 @@
   position: absolute;
   width: 3.25rem;
   height: 3.75rem;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
 
   &:nth-child(1) {
     top: 0.5rem;
@@ -156,7 +156,7 @@
   &:nth-child(3) {
     top: 0;
     left: 1.9rem;
-    background: v.$brick;
+    background: var(--qp-primary);
     transform: rotate(12deg);
   }
 }
@@ -168,7 +168,7 @@
   margin: 0 0 v.$space-12;
   padding: v.$space-6 v.$space-4;
   background: v.$white;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   box-shadow: v.$shadow-sm;
 
   @include m.tablet {
@@ -233,9 +233,9 @@
   flex-shrink: 0;
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   background: v.$cream-bg;
-  color: v.$brick;
+  color: var(--qp-primary);
 
   @include m.mobile {
     width: 2.25rem;
@@ -290,7 +290,7 @@
   background: none;
   border: none;
   color: v.$gray-500;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;
   cursor: pointer;
@@ -315,7 +315,7 @@
     height: 2.25rem;
     margin-bottom: 0;
     padding: 0;
-    border-radius: v.$r-pill;
+    border-radius: var(--qp-r-pill);
     background: v.$white;
     box-shadow: v.$shadow-sm;
 
@@ -397,10 +397,10 @@
   padding: v.$space-6;
   background: v.$white;
   border: none;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   box-shadow: v.$shadow-sm;
   text-align: start;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   transition: box-shadow v.$dur-fast v.$ease-out, transform v.$dur-fast v.$ease-out;
 
   @include m.short {
@@ -463,17 +463,17 @@ button.sectionCard {
   width: 100%;
   padding: v.$space-5;
   border: none;
-  border-radius: v.$r-md;
-  background: v.$brick;
+  border-radius: var(--qp-r-md);
+  background: var(--qp-primary);
   color: v.$white;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-md;
   font-weight: v.$fw-semibold;
   cursor: pointer;
   transition: background v.$dur-fast v.$ease-out;
 
   &:hover {
-    background: v.$brick-shade;
+    background: var(--qp-primary-hover);
   }
 
   @include m.short {
@@ -497,10 +497,10 @@ button.sectionCard {
   gap: v.$space-1;
   padding: v.$space-2 v.$space-4;
   border: none;
-  border-radius: v.$r-pill;
-  background: v.$brick;
+  border-radius: var(--qp-r-pill);
+  background: var(--qp-primary);
   color: v.$white;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;
   cursor: pointer;
@@ -508,7 +508,7 @@ button.sectionCard {
   transition: background v.$dur-fast v.$ease-out;
 
   &:hover {
-    background: v.$brick-shade;
+    background: var(--qp-primary-hover);
   }
 }
 
@@ -527,5 +527,5 @@ button.sectionCard {
 }
 
 .footerIcon {
-  color: v.$brick;
+  color: var(--qp-primary);
 }

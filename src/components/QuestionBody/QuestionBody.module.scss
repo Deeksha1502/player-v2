@@ -14,7 +14,7 @@
     max-width: 100%;
     height: auto;
     margin: v.$space-3 0;
-    border-radius: v.$r-sm;
+    border-radius: var(--qp-r-sm);
   }
 
   // Tables — scroll horizontally inside their own box rather than the page.

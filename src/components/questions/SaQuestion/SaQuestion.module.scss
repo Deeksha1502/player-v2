@@ -25,7 +25,7 @@
   @include m.focus-ring($color: v.$ink);
 
   padding: v.$space-2 v.$space-6;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   background: v.$ink;
   color: v.$white;
 
@@ -49,7 +49,7 @@
 }
 
 .answerText {
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   line-height: v.$lh-relaxed;
   color: v.$g700;

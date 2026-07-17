@@ -27,6 +27,18 @@
   // establish a fixed-positioning containing block across browsers, so we rely
   // on absolute positioning + this explicit relative anchor instead.)
   position: relative;
+  // Contains every z-index inside the player (sticky header: 100, drawer:
+  // 1000, toast: 1100, submit modal: 1200) to THIS box's own stacking
+  // context. Without this, those values compare directly against the HOST
+  // PAGE's own stacking order once painted (the shadow DOM boundary isolates
+  // styles, not z-index/stacking) — e.g. the sticky header's z-index:100 was
+  // rendering above a host dropdown menu using a lower z-index, because
+  // nothing forced a containing boundary at the shadow root. `isolation:
+  // isolate` guarantees one regardless of position/z-index, so the whole
+  // player now always paints as a single, ordinarily-stacked unit from the
+  // host's point of view — internal ordering between the player's own
+  // overlays is unaffected.
+  isolation: isolate;
   overflow-x: hidden; // hard guard: nothing scrolls the shell sideways
   // Overview / results / review render their screen directly in the shell (the
   // assessment stage scrolls via its inner .main). When the host constrains the
@@ -36,7 +48,7 @@
   // internally, so the shell never overflows.
   overflow-y: auto;
   background: v.$cream-bg;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
 }
 
 .appBody {
@@ -99,7 +111,7 @@
 .error {
   padding: v.$space-12;
   text-align: center;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   color: v.$g600;
 }
 

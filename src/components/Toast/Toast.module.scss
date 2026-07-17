@@ -27,7 +27,7 @@
   gap: v.$space-4;
   width: 100%;
   padding: v.$space-4 v.$space-5;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   box-shadow: v.$shadow-lg;
   pointer-events: auto;
   animation: toast-in v.$dur-base v.$ease-out;
@@ -51,13 +51,13 @@
 }
 
 .title {
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-bold;
 }
 
 .message {
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
 }
 
@@ -71,7 +71,7 @@
   margin-inline-start: auto;
   padding: v.$space-1;
   border: none;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   background: transparent;
   color: currentColor;
   opacity: 0.7;

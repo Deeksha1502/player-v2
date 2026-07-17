@@ -73,7 +73,7 @@ export function SectionIntro({
             </div>
 
             <button type="button" className={styles.startBtn} onClick={onBegin}>
-              {t(language, 'START_SECTION')} {letter} <span aria-hidden="true">→</span>
+              {t(language, 'START_SECTION')} {sectionName} <span aria-hidden="true">→</span>
             </button>
           </div>
         </article>

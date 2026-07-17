@@ -30,10 +30,10 @@
   min-width: 2.25rem;
   padding: 0;
   border: 1.5px solid v.$gray-200;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   background: v.$white;
   color: v.$g700;
-  font-family: v.$ff-base;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;
   font-variant-numeric: tabular-nums;
@@ -46,8 +46,8 @@
 }
 
 .current {
-  border-color: v.$brick;
-  background: v.$brick;
+  border-color: var(--qp-primary);
+  background: var(--qp-primary);
   color: v.$white;
 }
 
