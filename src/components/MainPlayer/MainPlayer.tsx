@@ -470,9 +470,18 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     // (playerEventNormalizer.ts → useContentStateUpdate) keys off this exact
     // onPlayerEvent shape to mark a QuestionSet attempt complete. Without it,
     // progress never advances for QuestionSet content played inside a course.
+    //
+    // ets is this event's own fire time (Date.now()), NOT the assessment
+    // start — for a long assessment those can be minutes/hours apart, and
+    // ets is meant to say "when did this happen". The assessment START time
+    // still travels separately as edata.starttime: the portal's
+    // playerEventNormalizer.ts reads THAT field specifically (as a fallback
+    // assessmentTs, "if START telemetry was missed") and ignores this
+    // top-level ets entirely for QUML_SUMMARY — so this only affects other/
+    // future consumers of the raw event, not the portal's current one.
     onPlayerEvent?.({
       eid: 'QUML_SUMMARY',
-      ets: starttime,
+      ets: Date.now(),
       edata: {
         starttime,
         extra: [

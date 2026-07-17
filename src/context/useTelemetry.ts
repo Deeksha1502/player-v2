@@ -145,7 +145,13 @@ export function useTelemetry() {
                 : 0,
           },
           { totalNoofQuestions: totalQuestions },
-          { visitedQuestions: totalQuestions },
+          // NOT totalQuestions: old player's own end() call hardcodes this to
+          // totalNumberOfQuestions too, but that's harmless there only because
+          // Angular's UI never reaches END before visiting every question. This
+          // player's header Submit is clickable from question 1 (no gating —
+          // PlayerHeader.tsx), so hardcoding here would make `visitedQuestions`
+          // silently disagree with `progress` above on an early submit.
+          { visitedQuestions: currentQuestionIndex },
           { endpageseen: true },
           { score },
         ],

@@ -121,7 +121,10 @@ describe('useTelemetry', () => {
       summary: [
         { progress: 60 },
         { totalNoofQuestions: 5 },
-        { visitedQuestions: 5 },
+        // Regression (PR review): must be currentQuestionIndex (3), not
+        // totalQuestions (5) — an early submit (question 3 of 5) must not
+        // silently claim all 5 were visited.
+        { visitedQuestions: 3 },
         { endpageseen: true },
         { score: 4 },
       ],
