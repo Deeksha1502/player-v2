@@ -106,9 +106,10 @@
 }
 
 .brandName {
+  font-family: var(--qp-font-sans);
   min-width: 0;
   font-size: v.$text-md;
-  font-weight: v.$fw-bold;
+  font-weight: v.$fw-regular;
   color: v.$g900;
   white-space: nowrap;
   overflow: hidden;

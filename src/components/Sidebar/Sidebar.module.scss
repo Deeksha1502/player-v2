@@ -106,8 +106,9 @@
 }
 
 .name {
+  font-family: var(--qp-font-sans);
   font-size: v.$text-base;
-  font-weight: v.$fw-bold;
+  font-weight: v.$fw-regular;
   color: v.$g900;
 }
 
