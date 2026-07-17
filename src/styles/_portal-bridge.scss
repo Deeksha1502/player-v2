@@ -14,19 +14,22 @@
 // values with no JS/config wiring at all; :root is included too for the dev
 // harness (src/App.tsx), which renders MainPlayer directly with no shadow root.
 //
-// Scope here is intentionally accent-only (primary/hover/subtle + font) — the
-// player's own warm terracotta surfaces/neutrals are a deliberate, distinct
-// visual identity (see variables.scss's own "$dark: PRIMARY CTA buttons (dark,
-// not terracotta)" comment) and are NOT bridged.
+// Scope here is accent + font + border-radius — the player's own warm
+// terracotta surfaces/neutrals are a deliberate, distinct visual identity
+// (see variables.scss's own "$dark: PRIMARY CTA buttons (dark, not
+// terracotta)" comment) and are NOT bridged.
 //
 // Portal variable format: --primary: H S% L% (raw HSL triplet, no hsl() wrapper)
 // Portal font token:      --app-font-family
+// Portal radius tokens:   --r-xxs / --r-xs / --r-sm / --r-md / --r-lg / --r-pill
+//                         (set per-template — Classic vs Modern — in the
+//                         portal's template-overrides.css)
 //
 // The fallback values below (not _tokens.scss's, which are only reached if
 // THIS file were ever removed) are what actually renders standalone (dev
 // harness, mobile app, editor preview) — they reproduce the player's
-// pre-bridge terracotta/Rubik default. Inside the portal, its live values
-// take over automatically.
+// pre-bridge terracotta/Rubik/Classic-radius default. Inside the portal, its
+// live values take over automatically.
 // =============================================================================
 
 :host,
@@ -36,4 +39,11 @@
   --qp-primary:        hsl(var(--primary, 15 51% 44%));
   --qp-primary-hover:  hsl(var(--primary, 14 50% 37%));
   --qp-primary-subtle: hsl(var(--primary, 15 51% 44%) / 0.12);
+
+  --qp-r-xxs:  var(--r-xxs, 0.25rem);
+  --qp-r-xs:   var(--r-xs, 0.625rem);
+  --qp-r-sm:   var(--r-sm, 0.5rem);
+  --qp-r-md:   var(--r-md, 0.875rem);
+  --qp-r-lg:   var(--r-lg, 1.25rem);
+  --qp-r-pill: var(--r-pill, 9999px);
 }

@@ -44,7 +44,7 @@
   min-height: 2.75rem; // comfortable touch target
   background: v.$white;
   border: 1.5px solid v.$gray-200;
-  border-radius: v.$r-xs;
+  border-radius: var(--qp-r-xs);
   cursor: pointer;
   font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
@@ -79,11 +79,11 @@
 }
 
 .radio {
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
 }
 
 .checkbox {
-  border-radius: v.$r-xxs;
+  border-radius: var(--qp-r-xxs);
 }
 
 .selected .indicator {
@@ -117,7 +117,7 @@
   padding: v.$space-3;
   background: v.$success-bg;
   border-inline-start: 3px solid v.$success;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   font-weight: v.$fw-medium;
   color: v.$success;
 }

@@ -17,4 +17,16 @@
   // Typography (portal-bridged; see _portal-bridge.scss)
   // ---------------------------------------------------------------------------
   --qp-font-sans: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  // ---------------------------------------------------------------------------
+  // Border radius (portal-bridged; see _portal-bridge.scss). These are the
+  // exact values the portal's "Classic" template uses for --r-* — the
+  // player's shapes were designed to match Classic by default.
+  // ---------------------------------------------------------------------------
+  --qp-r-xxs: 0.25rem;
+  --qp-r-xs:  0.625rem;
+  --qp-r-sm:  0.5rem;
+  --qp-r-md:  0.875rem;
+  --qp-r-lg:  1.25rem;
+  --qp-r-pill: 9999px;
 }

@@ -52,7 +52,7 @@
   height: 2.5rem;
   padding: v.$space-1;
   border: 1.5px solid v.$gray-200;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   background: v.$white;
   color: v.$g700;
   cursor: pointer;
@@ -79,7 +79,7 @@
   min-width: 0;
   padding: v.$space-1;
   border: none;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   background: transparent;
   cursor: pointer;
 
@@ -98,7 +98,7 @@
   justify-content: center;
   width: 2rem;
   height: 2rem;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   background: var(--qp-primary);
   color: v.$white;
   font-size: v.$text-sm;
@@ -179,7 +179,7 @@
   justify-content: center;
   width: 1.75rem;
   height: 1.75rem;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   background: v.$g100;
   color: v.$gray-400;
   font-size: v.$text-xs;
@@ -202,7 +202,7 @@
   align-items: center;
   gap: v.$space-2;
   padding: v.$space-2 v.$space-3;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   background: v.$g100;
   color: v.$g700;
   font-size: v.$text-sm;
@@ -235,7 +235,7 @@
   justify-content: center;
   width: 1.75rem;
   height: 1.75rem;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   border: 1.5px solid v.$gray-300;
   background: transparent;
   color: v.$gray-500;
@@ -265,7 +265,7 @@
   padding: v.$space-4;
   background: v.$white;
   border: 1px solid v.$gray-200;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   box-shadow: v.$shadow-lg;
   display: flex;
   flex-direction: column;
@@ -296,7 +296,7 @@
   flex-shrink: 0;
   width: 1.5rem;
   height: 1.5rem;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   background: v.$g100;
   color: v.$gray-400;
   font-size: v.$text-xs;

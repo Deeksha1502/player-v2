@@ -33,7 +33,7 @@
 
 .panel {
   padding: v.$space-5;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   font-family: var(--qp-font-sans);
 }
 

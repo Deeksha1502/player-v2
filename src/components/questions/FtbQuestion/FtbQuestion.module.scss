@@ -34,7 +34,7 @@
   font-weight: v.$fw-bold;
   color: var(--qp-primary);
   background: var(--qp-primary-subtle);
-  border-radius: v.$r-xxs;
+  border-radius: var(--qp-r-xxs);
   padding: 0 5px;
 }
 
@@ -43,7 +43,7 @@
   max-width: 100%;
   border: none;
   border-bottom: 2.5px solid v.$gray-300;
-  border-radius: v.$r-xxs v.$r-xxs 0 0;
+  border-radius: var(--qp-r-xxs) var(--qp-r-xxs) 0 0;
   padding: 2px v.$space-2 4px;
   background: rgba(0, 0, 0, 0.02);
   font-family: var(--qp-font-sans);

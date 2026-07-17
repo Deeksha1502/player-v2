@@ -44,7 +44,7 @@
   flex-shrink: 0;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   color: v.$white;
   font-size: v.$text-base;
   font-weight: v.$fw-bold;
@@ -139,7 +139,7 @@
   position: absolute;
   width: 3.25rem;
   height: 3.75rem;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
 
   &:nth-child(1) {
     top: 0.5rem;
@@ -168,7 +168,7 @@
   margin: 0 0 v.$space-12;
   padding: v.$space-6 v.$space-4;
   background: v.$white;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   box-shadow: v.$shadow-sm;
 
   @include m.tablet {
@@ -233,7 +233,7 @@
   flex-shrink: 0;
   width: 2.75rem;
   height: 2.75rem;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   background: v.$cream-bg;
   color: var(--qp-primary);
 
@@ -315,7 +315,7 @@
     height: 2.25rem;
     margin-bottom: 0;
     padding: 0;
-    border-radius: v.$r-pill;
+    border-radius: var(--qp-r-pill);
     background: v.$white;
     box-shadow: v.$shadow-sm;
 
@@ -397,7 +397,7 @@
   padding: v.$space-6;
   background: v.$white;
   border: none;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   box-shadow: v.$shadow-sm;
   text-align: start;
   font-family: var(--qp-font-sans);
@@ -463,7 +463,7 @@ button.sectionCard {
   width: 100%;
   padding: v.$space-5;
   border: none;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   background: var(--qp-primary);
   color: v.$white;
   font-family: var(--qp-font-sans);
@@ -497,7 +497,7 @@ button.sectionCard {
   gap: v.$space-1;
   padding: v.$space-2 v.$space-4;
   border: none;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   background: var(--qp-primary);
   color: v.$white;
   font-family: var(--qp-font-sans);

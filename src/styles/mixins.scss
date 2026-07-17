@@ -84,7 +84,7 @@
   gap: v.$space-2;
   padding: v.$space-3 v.$space-6;
   border: none;
-  border-radius: v.$r-xs;
+  border-radius: var(--qp-r-xs);
   font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;

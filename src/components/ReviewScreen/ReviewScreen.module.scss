@@ -102,7 +102,7 @@
   align-self: center;
   margin-bottom: v.$space-5;
   padding: v.$space-2 v.$space-5;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;
 
@@ -191,7 +191,7 @@
     width: 2.25rem;
     height: 2.25rem;
     padding: 0;
-    border-radius: v.$r-pill;
+    border-radius: var(--qp-r-pill);
     background: v.$white;
     box-shadow: v.$shadow-sm;
 

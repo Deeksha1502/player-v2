@@ -8,7 +8,7 @@
   padding: v.$space-4;
   border-left: 4px solid v.$danger;
   background: v.$danger-bg;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   color: v.$danger;
   font-family: var(--qp-font-sans);
   font-size: v.$text-sm;

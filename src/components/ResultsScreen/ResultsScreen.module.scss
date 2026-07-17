@@ -19,7 +19,7 @@
   max-width: 560px;
   padding: v.$space-10 v.$space-8;
   background: v.$ivory;
-  border-radius: v.$r-lg;
+  border-radius: var(--qp-r-lg);
   box-shadow: v.$shadow-card;
   text-align: center;
 

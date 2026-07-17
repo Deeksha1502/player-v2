@@ -32,7 +32,7 @@
   min-height: 4rem;
   background: v.$white;
   border: 1.5px solid v.$gray-200;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   cursor: pointer;
   font-family: var(--qp-font-sans);
   font-size: v.$text-md;
@@ -83,7 +83,7 @@
   padding: v.$space-3;
   background: v.$success-bg;
   border-inline-start: 3px solid v.$success;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   font-weight: v.$fw-medium;
   color: v.$success;
 }

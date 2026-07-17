@@ -25,7 +25,7 @@
   padding: v.$space-4;
   background: v.$g100;
   border: 1.5px dashed v.$gray-200;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   transition: border-color v.$dur-fast v.$ease-out, background v.$dur-fast v.$ease-out;
 }
 
@@ -55,7 +55,7 @@
   background: var(--qp-primary);
   color: v.$white;
   border: none;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-medium;
@@ -86,7 +86,7 @@
   background: v.$white;
   color: v.$g700;
   border: 1.5px solid v.$gray-200;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-medium;

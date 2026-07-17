@@ -36,7 +36,7 @@
   padding: v.$space-3 v.$space-4;
   background: v.$white;
   border: 1.5px solid v.$gray-200;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   box-shadow: v.$shadow-card;
   cursor: grab;
   user-select: none;

@@ -41,7 +41,7 @@
   width: 100%;
   padding: v.$space-5;
   border: 1.5px solid transparent;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   background: v.$white;
   box-shadow: v.$shadow-sm;
   text-align: start;
@@ -67,7 +67,7 @@
   flex-shrink: 0;
   width: 2rem;
   height: 2rem;
-  border-radius: v.$r-pill;
+  border-radius: var(--qp-r-pill);
   background: v.$g200;
   color: v.$gray-500;
   font-size: v.$text-sm;
@@ -81,7 +81,7 @@
     bottom: -1px;
     width: 0.5rem;
     height: 0.5rem;
-    border-radius: v.$r-pill;
+    border-radius: var(--qp-r-pill);
     background: v.$ginger;
     border: 1.5px solid v.$white;
   }

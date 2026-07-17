@@ -33,7 +33,7 @@
   justify-content: center;
   padding: v.$space-1;
   border: none;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   background: transparent;
   color: v.$g600;
   cursor: pointer;
@@ -62,7 +62,7 @@
   align-items: center;
   gap: v.$space-2;
   padding: v.$space-1 v.$space-3;
-  border-radius: v.$r-sm;
+  border-radius: var(--qp-r-sm);
   background: v.$g100;
   color: v.$g600;
   font-family: var(--qp-font-sans);

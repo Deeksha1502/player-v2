@@ -7,7 +7,7 @@
   padding: v.$space-8 v.$space-6;
   background: v.$white;
   border: 1px solid v.$gray-200;
-  border-radius: v.$r-lg;
+  border-radius: var(--qp-r-lg);
   box-shadow: v.$shadow-card;
   text-align: center;
   font-family: var(--qp-font-sans);
@@ -34,7 +34,7 @@
   gap: 1px;
   margin: 0 0 v.$space-6;
   background: v.$g100;
-  border-radius: v.$r-md;
+  border-radius: var(--qp-r-md);
   overflow: hidden;
 
   @include m.mobile {
