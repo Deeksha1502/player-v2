@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { t, readI18n } from '../../i18n/translations';
 import { QuestionBody } from '../QuestionBody/QuestionBody';
 import { HintIcon } from '../icons';
+import { useTelemetry } from '../../context/useTelemetry';
 import type { I18nValue } from '../../types';
 import type { MediaResolveContext } from '../../utils/media';
 import styles from './Hint.module.scss';
@@ -32,6 +33,8 @@ export interface HintProps {
   language?: string;
   /** Media + offline resolution inputs so solution/hint assets resolve like the stem. */
   mediaCtx?: MediaResolveContext;
+  /** Current slide index, for the INTERACT event's pageid (Angular parity). */
+  pageIndex?: number;
 }
 
 /**
@@ -61,9 +64,22 @@ export function Hint({
   showSolutions: showSolutionsFlag = false,
   language = 'en',
   mediaCtx,
+  pageIndex,
 }: HintProps) {
+  const { logInteraction } = useTelemetry();
   const [showHint, setShowHint] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
+
+  // Angular parity (section-player.component.ts:1076/1056/1069 —
+  // eventName.viewHint/viewSolutionClicked/solutionClosed).
+  const toggleHint = () => {
+    if (!showHint) logInteraction('view_hint', pageIndex);
+    setShowHint((s) => !s);
+  };
+  const toggleSolution = () => {
+    logInteraction(showSolution ? 'solution_closed' : 'view_solution_clicked', pageIndex);
+    setShowSolution((s) => !s);
+  };
 
   const hintHtml = hints.map((h) => extractHtml(h, language)).filter(Boolean);
   const solutionHtml = solutions.map((s) => extractHtml(s, language)).filter(Boolean);
@@ -85,7 +101,7 @@ export function Hint({
           <button
             type="button"
             className={styles.toggleBtn}
-            onClick={() => setShowHint((s) => !s)}
+            onClick={toggleHint}
             aria-expanded={showHint}
           >
             <HintIcon size={16} />
@@ -96,7 +112,7 @@ export function Hint({
           <button
             type="button"
             className={styles.toggleBtn}
-            onClick={() => setShowSolution((s) => !s)}
+            onClick={toggleSolution}
             aria-expanded={showSolution}
           >
             {t(language, 'VIEW_SOLUTION')}

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QumlProvider } from '../../context/QumlContext';
 import { MainPlayer } from './MainPlayer';
+import { subscribeTelemetry, clearEventQueue } from '../../services/telemetry-service';
 import type { PlayerConfig } from '../../types';
 
 // Simulate the PORTAL end-to-end: it passes SHALLOW metadata (identifier only,
@@ -100,5 +101,21 @@ describe('MainPlayer — full portal path (shallow metadata → /portal fetch �
     expect(screen.getByText(/capital of France/i)).toBeInTheDocument();
     expect(screen.getByText('Paris')).toBeInTheDocument();
     expect(screen.getAllByRole('radio')).toHaveLength(2);
+  });
+
+  it('raises an ERROR telemetry event when the hierarchy fetch fails (Angular parity: content-load failure)', async () => {
+    mockGet.mockRejectedValue(new Error('network down'));
+    clearEventQueue();
+    const received: { eid: string }[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e));
+
+    render(
+      <QumlProvider playerConfig={cfg}>
+        <MainPlayer playerConfig={cfg} />
+      </QumlProvider>,
+    );
+
+    await waitFor(() => expect(received.some((e) => e.eid === 'ERROR')).toBe(true));
+    unsub();
   });
 });

@@ -11,6 +11,7 @@ const { calculateScore } = vi.hoisted(() => ({ calculateScore: vi.fn() }));
 vi.mock('../../registry/scoring-registry', () => ({ calculateScore }));
 vi.mock('../../context/useTelemetry', () => ({
   useTelemetry: () => ({
+    logInteraction: vi.fn(),
     logOptionSelected: vi.fn(),
     logAnswerSubmitted: vi.fn(),
     logPageViewed: vi.fn(),

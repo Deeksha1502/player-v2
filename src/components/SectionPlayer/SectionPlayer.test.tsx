@@ -12,6 +12,7 @@ const { logAnswerSubmitted, logResponse } = vi.hoisted(() => ({
 }));
 vi.mock('../../context/useTelemetry', () => ({
   useTelemetry: () => ({
+    logInteraction: vi.fn(),
     logOptionSelected: vi.fn(),
     logAnswerSubmitted,
     logPageViewed: vi.fn(),
@@ -118,6 +119,7 @@ describe('SectionPlayer', () => {
       expect.anything(),
       2,
       2,
+      expect.objectContaining({ sectionId: 's1' }),
     );
   });
 
