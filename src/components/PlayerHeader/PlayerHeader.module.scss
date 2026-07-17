@@ -4,7 +4,7 @@
 .header {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 25;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -253,14 +253,14 @@
 .legendBackdrop {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 20;
 }
 
 .legend {
   position: absolute;
   top: calc(100% + 0.5rem);
   right: 0;
-  z-index: 41;
+  z-index: 21;
   min-width: 13.5rem;
   padding: v.$space-4;
   background: v.$white;
