@@ -230,4 +230,73 @@ describe('score utils (Angular evaluateAutoScored parity, normalized to 0..1)', 
     // Unknown language → falls back to the top-level (English) order.
     expect(calculateOrderedScore(q, { order: ['A', 'B', 'C', 'D', 'E', 'F'] }, 'zz')).toBe(1);
   });
+
+  it('ordered (REO) duplicate words: a harmless swap between identical-looking chips still scores full marks', () => {
+    // "the cat sat on the mat" — 'A' and 'E' are both "the", at different
+    // positions. A learner has no way to tell the two "the" chips apart.
+    const q = {
+      identifier: 'q',
+      body: '',
+      primaryCategory: 'reorder question',
+      maxScore: 1,
+      outcomeDeclaration: { maxScore: { defaultValue: 1 } },
+      interactions: {
+        response1: {
+          options: [
+            { value: 'A', label: 'the' },
+            { value: 'B', label: 'cat' },
+            { value: 'C', label: 'sat' },
+            { value: 'D', label: 'on' },
+            { value: 'E', label: 'the' },
+            { value: 'F', label: 'mat' },
+          ],
+        },
+      },
+      responseDeclaration: {
+        response1: {
+          cardinality: 'ordered',
+          type: 'string',
+          correctResponse: { value: ['A', 'B', 'C', 'D', 'E', 'F'] },
+        },
+      },
+    } as unknown as Question;
+
+    // Swap the two "the" instances (A <-> E) — sentence text is unchanged.
+    expect(calculateOrderedScore(q, { order: ['E', 'B', 'C', 'D', 'A', 'F'] })).toBe(1);
+    // Genuine misplacement — "the" (E) landed on the "cat" slot — still wrong.
+    expect(calculateOrderedScore(q, { order: ['A', 'E', 'C', 'D', 'B', 'F'] })).toBe(0);
+  });
+
+  it('ordered (REO) duplicate words, MAP_RESPONSE: a harmless swap still earns full per-position credit', () => {
+    const q = {
+      identifier: 'q',
+      body: '',
+      primaryCategory: 'reorder question',
+      maxScore: 2,
+      outcomeDeclaration: { maxScore: { defaultValue: 2 } },
+      responseProcessing: { template: 'MAP_RESPONSE' },
+      interactions: {
+        response1: {
+          options: [
+            { value: 'A', label: 'the' },
+            { value: 'B', label: 'the' },
+          ],
+        },
+      },
+      responseDeclaration: {
+        response1: {
+          cardinality: 'ordered',
+          type: 'string',
+          correctResponse: { value: ['A', 'B'] },
+          mapping: [
+            { value: 'A', score: 1 },
+            { value: 'B', score: 1 },
+          ],
+        },
+      },
+    } as unknown as Question;
+
+    // Swapped values, identical words at each position — full credit.
+    expect(calculateOrderedScore(q, { order: ['B', 'A'] })).toBe(1);
+  });
 });
