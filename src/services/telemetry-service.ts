@@ -62,6 +62,16 @@ interface TelemetryEvent {
   eid: string;
   edata: unknown;
   timestamp: number;
+  // Real Sunbird v3 telemetry envelope field name. The portal's
+  // useContentStateUpdate.ts accumulates raw ASSESS events (via this same
+  // bridge object) into assessments[].events for the backend's
+  // AssessmentAggregatorActor, whose getUniqueQuestions dedupes multiple
+  // attempts at the same question by sorting on `ets` (NOT `timestamp`) and
+  // keeping the latest. Without this field, every event defaults to
+  // System.currentTimeMillis() server-side — all landing in the same
+  // instant — so "keep the latest attempt" becomes unreliable and can pick
+  // an earlier, wrong answer over the final correct one.
+  ets: number;
 }
 
 let telemetrySDK: any = null;
@@ -276,7 +286,7 @@ function sendToSdk(event: TelemetryEvent): boolean {
 
 /** Raise an INTERACT event (user action). */
 export function raiseInteractEvent(data: unknown): void {
-  const event: TelemetryEvent = { eid: 'INTERACT', edata: data, timestamp: Date.now() };
+  const event: TelemetryEvent = { eid: 'INTERACT', edata: data, timestamp: Date.now(), ets: Date.now() };
   sendToSdk(event);
   emit(event);
   if (csEventOptions) {
@@ -289,7 +299,7 @@ export function raiseInteractEvent(data: unknown): void {
 
 /** Raise an ASSESS event (answer submission). */
 export function raiseAssessEvent(data: unknown): void {
-  const event: TelemetryEvent = { eid: 'ASSESS', edata: data, timestamp: Date.now() };
+  const event: TelemetryEvent = { eid: 'ASSESS', edata: data, timestamp: Date.now(), ets: Date.now() };
   sendToSdk(event);
   emit(event);
   if (csEventOptions) {
@@ -299,7 +309,7 @@ export function raiseAssessEvent(data: unknown): void {
 
 /** Raise an IMPRESSION event (page view). */
 export function raiseImpressionEvent(data: unknown): void {
-  const event: TelemetryEvent = { eid: 'IMPRESSION', edata: data, timestamp: Date.now() };
+  const event: TelemetryEvent = { eid: 'IMPRESSION', edata: data, timestamp: Date.now(), ets: Date.now() };
   sendToSdk(event);
   emit(event);
   if (csEventOptions) {
@@ -312,7 +322,7 @@ export function raiseImpressionEvent(data: unknown): void {
 
 /** Raise a START event (assessment begins). */
 export function raiseStartEvent(data: unknown): void {
-  const event: TelemetryEvent = { eid: 'START', edata: data, timestamp: Date.now() };
+  const event: TelemetryEvent = { eid: 'START', edata: data, timestamp: Date.now(), ets: Date.now() };
   sendToSdk(event);
   emit(event);
   if (csEventOptions) {
@@ -325,7 +335,7 @@ export function raiseStartEvent(data: unknown): void {
 
 /** Raise an END event (assessment submitted). */
 export function raiseEndEvent(data: unknown): void {
-  const event: TelemetryEvent = { eid: 'END', edata: data, timestamp: Date.now() };
+  const event: TelemetryEvent = { eid: 'END', edata: data, timestamp: Date.now(), ets: Date.now() };
   sendToSdk(event);
   emit(event);
   if (csEventOptions) {
@@ -338,7 +348,7 @@ export function raiseEndEvent(data: unknown): void {
 
 /** Raise a SUMMARY event (score breakdown). */
 export function raiseSummaryEvent(data: unknown): void {
-  const event: TelemetryEvent = { eid: 'SUMMARY', edata: data, timestamp: Date.now() };
+  const event: TelemetryEvent = { eid: 'SUMMARY', edata: data, timestamp: Date.now(), ets: Date.now() };
   sendToSdk(event);
   emit(event);
   if (csEventOptions) {
@@ -348,7 +358,7 @@ export function raiseSummaryEvent(data: unknown): void {
 
 /** Raise an ERROR event. */
 export function raiseErrorEvent(data: unknown): void {
-  const event: TelemetryEvent = { eid: 'ERROR', edata: data, timestamp: Date.now() };
+  const event: TelemetryEvent = { eid: 'ERROR', edata: data, timestamp: Date.now(), ets: Date.now() };
   sendToSdk(event);
   emit(event);
   if (csEventOptions) {
@@ -365,7 +375,7 @@ export function raiseErrorEvent(data: unknown): void {
  * LEFT, not the one just answered — distinct from ASSESS).
  */
 export function raiseResponseEvent(data: unknown): void {
-  const event: TelemetryEvent = { eid: 'RESPONSE', edata: data, timestamp: Date.now() };
+  const event: TelemetryEvent = { eid: 'RESPONSE', edata: data, timestamp: Date.now(), ets: Date.now() };
   sendToSdk(event);
   emit(event);
   if (csEventOptions) {
