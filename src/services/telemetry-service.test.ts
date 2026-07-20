@@ -79,4 +79,15 @@ describe('telemetry-service — SDK method guards', () => {
     raiseInteractEvent({ a: 1 });
     expect(logEvent).not.toHaveBeenCalled(); // would fire if the stale ref lingered
   });
+
+  it('regression: bridge event includes ets (not just timestamp) — the portal accumulates raw ASSESS events into assessments[].events, and the backend\'s getUniqueQuestions dedupes multiple attempts at the same question by sorting on `ets`; without it every event defaults server-side to "now", making "keep the latest attempt" unreliable and able to pick an earlier wrong answer over the final correct one', () => {
+    initializeTelemetry(ctx);
+    const received: { ets?: number; timestamp?: number }[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e));
+
+    raiseInteractEvent({ a: 1 });
+
+    expect(typeof received[0].ets).toBe('number');
+    unsub();
+  });
 });
