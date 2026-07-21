@@ -17,6 +17,7 @@ import {
   raiseErrorEvent,
   raiseResponseEvent,
   flushPendingAssessEvents,
+  flushPendingAssessEvent,
   cancelPendingAssessEvent,
 } from '../services/telemetry-service';
 
@@ -235,12 +236,22 @@ export function useTelemetry() {
   );
 
   /**
-   * Force immediate delivery of any debounced ASSESS event(s) — call before
-   * navigating away from a question or finalizing submission, so a fast
+   * Force immediate delivery of EVERY debounced ASSESS event — call when
+   * finalizing submission (the whole assessment is ending), so a fast
    * type-then-submit doesn't lose the last answer to the debounce timer.
+   * Prefer flushAssessEvent(questionId) when only one question is relevant.
    */
   const flushAssessEvents = useCallback(() => {
     flushPendingAssessEvents();
+  }, []);
+
+  /**
+   * Force immediate delivery of the debounced ASSESS event for ONE
+   * question — call when navigating away from it, so a still-pending
+   * answer for a different question isn't force-flushed too.
+   */
+  const flushAssessEvent = useCallback((questionId: string) => {
+    flushPendingAssessEvent(questionId);
   }, []);
 
   /**
@@ -263,6 +274,7 @@ export function useTelemetry() {
     logError,
     logResponse,
     flushAssessEvents,
+    flushAssessEvent,
     cancelAssessEvent,
   };
 }

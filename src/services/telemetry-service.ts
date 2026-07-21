@@ -89,7 +89,11 @@ let eventQueue: TelemetryEvent[] = [];
  */
 const ASSESS_DEBOUNCE_MS = 2000;
 const pendingAssessTimers = new Map<string, ReturnType<typeof setTimeout>>();
-const pendingAssessData = new Map<string, unknown>();
+// Stores the fully-built event (ets/timestamp already stamped at the
+// original raiseAssessEvent call), not raw edata — so a debounced event
+// reports when the learner actually interacted, not when the timer happened
+// to fire later.
+const pendingAssessData = new Map<string, TelemetryEvent>();
 
 function assessKey(data: unknown): string {
   const item = (data as { item?: { id?: string } } | null)?.item;
@@ -316,12 +320,13 @@ export function raiseInteractEvent(data: unknown): void {
   }
 }
 
-function dispatchAssessEvent(data: unknown): void {
-  const event: TelemetryEvent = { eid: 'ASSESS', edata: data, timestamp: Date.now(), ets: Date.now() };
+/** Sends an already-built ASSESS event — timestamps are captured by the
+ * caller at the original interaction time, not here. */
+function dispatchAssessEvent(event: TelemetryEvent): void {
   sendToSdk(event);
   emit(event);
   if (csEventOptions) {
-    CsTelemetryModule.instance.telemetryService.raiseAssesTelemetry(data, csEventOptions);
+    CsTelemetryModule.instance.telemetryService.raiseAssesTelemetry(event.edata, csEventOptions);
   }
 }
 
@@ -329,33 +334,60 @@ function dispatchAssessEvent(data: unknown): void {
  * Raise an ASSESS event (answer submission), debounced per-question — see
  * the ASSESS debounce note above `pendingAssessTimers`. Repeated calls for
  * the same question reset the timer and keep only the latest value; call
- * flushPendingAssessEvents() to force immediate delivery.
+ * flushPendingAssessEvent(questionId)/flushPendingAssessEvents() to force
+ * immediate delivery. `ets`/`timestamp` are stamped NOW, at the moment the
+ * learner actually answered — not later when the timer fires — so a
+ * debounced event still reports the real interaction time.
  */
 export function raiseAssessEvent(data: unknown): void {
   const key = assessKey(data);
+  const event: TelemetryEvent = { eid: 'ASSESS', edata: data, timestamp: Date.now(), ets: Date.now() };
+  if (!key) {
+    // No question id to sensibly coalesce by — dispatch immediately rather
+    // than sharing one bucket with unrelated malformed events.
+    dispatchAssessEvent(event);
+    return;
+  }
   const existing = pendingAssessTimers.get(key);
   if (existing) clearTimeout(existing);
-  pendingAssessData.set(key, data);
+  pendingAssessData.set(key, event);
   pendingAssessTimers.set(
     key,
     setTimeout(() => {
       pendingAssessTimers.delete(key);
       pendingAssessData.delete(key);
-      dispatchAssessEvent(data);
+      dispatchAssessEvent(event);
     }, ASSESS_DEBOUNCE_MS),
   );
 }
 
 /**
- * Immediately dispatch (and stop debouncing) any pending ASSESS events —
- * call before navigating away from a question or finalizing submission, so
- * a fast type-then-submit doesn't lose the last answer.
+ * Immediately dispatch (and stop debouncing) every pending ASSESS event —
+ * call before finalizing submission, so a fast type-then-submit doesn't
+ * lose the last answer to the debounce timer. Flushes ALL questions, not
+ * just one — appropriate for "the whole assessment is ending," but prefer
+ * flushPendingAssessEvent(questionId) when only one question is relevant
+ * (e.g. navigating away from it), so navigating away from Q1 doesn't also
+ * force-flush an unrelated still-pending Q5.
  */
 export function flushPendingAssessEvents(): void {
   pendingAssessTimers.forEach((timer) => clearTimeout(timer));
   pendingAssessTimers.clear();
-  pendingAssessData.forEach((data) => dispatchAssessEvent(data));
+  pendingAssessData.forEach((event) => dispatchAssessEvent(event));
   pendingAssessData.clear();
+}
+
+/**
+ * Immediately dispatch (and stop debouncing) the pending ASSESS event for
+ * ONE question, leaving any other pending question's timer untouched.
+ */
+export function flushPendingAssessEvent(questionId: string): void {
+  const existing = pendingAssessTimers.get(questionId);
+  if (existing) clearTimeout(existing);
+  pendingAssessTimers.delete(questionId);
+  const event = pendingAssessData.get(questionId);
+  pendingAssessData.delete(questionId);
+  if (event) dispatchAssessEvent(event);
 }
 
 /**

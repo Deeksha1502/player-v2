@@ -47,7 +47,7 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
     logAnswerSubmitted,
     logPageViewed,
     logResponse,
-    flushAssessEvents,
+    flushAssessEvent,
     cancelAssessEvent,
   } = useTelemetry();
   const language = state.language;
@@ -83,14 +83,23 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
   }, [currentSlide]);
 
   // ASSESS events are debounced per-question (telemetry-service.ts) — flush
-  // any pending one right before the slide changes again (internal Next/
-  // Previous, an external sidebar jump, or unmount), so a debounced answer
-  // isn't left waiting out its timer after the learner has already moved on.
+  // the LEAVING question's pending one right before the slide changes again
+  // (internal Next/Previous, an external sidebar jump, or unmount — the
+  // latter also covers moving to a new section, since MainPlayer keys
+  // SectionPlayer by section index, forcing a remount), so a debounced
+  // answer isn't left waiting out its timer after the learner has moved on.
+  // Scoped to just this question — a still-pending different question
+  // elsewhere isn't force-flushed too. `questions` is intentionally left
+  // out of the deps (recomputed fresh every render from section.children;
+  // depending on it would re-fire this effect on every render) — read
+  // fresh at cleanup time instead.
   useEffect(() => {
     return () => {
-      flushAssessEvents();
+      const leavingQuestionId = questions[currentSlide]?.identifier;
+      if (leavingQuestionId) flushAssessEvent(leavingQuestionId);
     };
-  }, [currentSlide, flushAssessEvents]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSlide, flushAssessEvent]);
 
   // Feedback dwell: how long the Correct/Wrong toast stays on the current
   // question before auto-advancing (see proceedWithFeedback).

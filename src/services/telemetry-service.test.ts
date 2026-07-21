@@ -4,6 +4,7 @@ import {
   raiseInteractEvent,
   raiseAssessEvent,
   flushPendingAssessEvents,
+  flushPendingAssessEvent,
   cancelPendingAssessEvent,
   subscribeTelemetry,
   getQueuedEvents,
@@ -158,6 +159,51 @@ describe('telemetry-service — ASSESS debounce (FTB/MTF/SEQ/REO fire per keystr
     vi.advanceTimersByTime(2000);
 
     expect(received).toHaveLength(0);
+    unsub();
+  });
+
+  it('ets/timestamp reflect the original interaction time, not the later flush/dispatch time', () => {
+    const received: { ets: number; timestamp: number }[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e as { ets: number; timestamp: number }));
+
+    vi.setSystemTime(1_000_000);
+    raiseAssessEvent({ item: { id: 'q1' }, resvalues: [{ value: 'paris' }] });
+
+    // Time passes before the debounce timer actually fires.
+    vi.setSystemTime(1_000_000 + 5_000);
+    vi.advanceTimersByTime(2000);
+
+    expect(received).toHaveLength(1);
+    expect(received[0].ets).toBe(1_000_000);
+    expect(received[0].timestamp).toBe(1_000_000);
+    unsub();
+  });
+
+  it('flushPendingAssessEvent(questionId) flushes only that question, leaving another pending question untouched', () => {
+    const received: { edata: { item: { id: string } } }[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e as { edata: { item: { id: string } } }));
+
+    raiseAssessEvent({ item: { id: 'q1' }, resvalues: [{ value: 'a' }] });
+    raiseAssessEvent({ item: { id: 'q2' }, resvalues: [{ value: 'b' }] });
+
+    flushPendingAssessEvent('q1');
+    expect(received).toHaveLength(1);
+    expect(received[0].edata.item.id).toBe('q1');
+
+    // q2 is still pending — its own timer fires later, undisturbed.
+    vi.advanceTimersByTime(2000);
+    expect(received).toHaveLength(2);
+    expect(received[1].edata.item.id).toBe('q2');
+    unsub();
+  });
+
+  it('dispatches immediately, bypassing the debounce timer, when there is no question id to coalesce by', () => {
+    const received: unknown[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e));
+
+    raiseAssessEvent({ resvalues: [{ value: 'no item id here' }] });
+
+    expect(received).toHaveLength(1); // no vi.advanceTimersByTime needed
     unsub();
   });
 });
