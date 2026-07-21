@@ -16,6 +16,8 @@ vi.mock('../../context/useTelemetry', () => ({
     logAnswerSubmitted: vi.fn(),
     logPageViewed: vi.fn(),
     logResponse: vi.fn(),
+    flushAssessEvent: vi.fn(),
+    cancelAssessEvent: vi.fn(),
   }),
 }));
 

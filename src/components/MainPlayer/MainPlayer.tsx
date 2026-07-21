@@ -96,7 +96,7 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   // initializer only runs once, on first render, so this is effectively
   // "player mounted at".
   const playerMountedAtRef = useRef<number>(Date.now());
-  const { logInteraction, logAssessmentStart, logAssessmentEnd, logSummary, logError } =
+  const { logInteraction, logAssessmentStart, logAssessmentEnd, logSummary, logError, flushAssessEvents } =
     useTelemetry();
 
   // Section intros can be disabled via config (spec §6.0).
@@ -447,6 +447,10 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   };
 
   const handleConfirmSubmit = () => {
+    // Header Submit has no gating (can fire from any question, bypassing
+    // SectionPlayer's own flush-on-navigate) — flush any debounced ASSESS
+    // event first, so it reaches the wire before END/SUMMARY/QUML_SUMMARY.
+    flushAssessEvents();
     // Angular parity (main-player.component.ts:506, eventName.scoreBoardSubmitClicked).
     logInteraction('score_board_submit_clicked');
     setSubmitDialog(false);
