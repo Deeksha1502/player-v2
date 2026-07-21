@@ -299,4 +299,45 @@ describe('score utils (Angular evaluateAutoScored parity, normalized to 0..1)', 
     // Swapped values, identical words at each position — full credit.
     expect(calculateOrderedScore(q, { order: ['B', 'A'] })).toBe(1);
   });
+
+  it('ordered (REO) duplicate words, MAP_RESPONSE with DIFFERENT per-position scores: a swap is credited from the expected slot, not the dragged-in value\'s own score', () => {
+    // Both options are "the", but position 0 is worth 1 and position 1 is
+    // worth 3. Documents an intentional choice: since the learner can't tell
+    // the chips apart, credit for a word-match is awarded from the position's
+    // OWN expected score (scoreByValue keyed by the correct slot's value),
+    // never the physically-dragged-in option's own mapping score.
+    const q = {
+      identifier: 'q',
+      body: '',
+      primaryCategory: 'reorder question',
+      maxScore: 4,
+      outcomeDeclaration: { maxScore: { defaultValue: 4 } },
+      responseProcessing: { template: 'MAP_RESPONSE' },
+      interactions: {
+        response1: {
+          options: [
+            { value: 'A', label: 'the' },
+            { value: 'E', label: 'the' },
+          ],
+        },
+      },
+      responseDeclaration: {
+        response1: {
+          cardinality: 'ordered',
+          type: 'string',
+          correctResponse: { value: ['A', 'E'] },
+          mapping: [
+            { value: 'A', score: 1 },
+            { value: 'E', score: 3 },
+          ],
+        },
+      },
+    } as unknown as Question;
+
+    // Swapped: 'E' (its own score 3) placed in slot 0 (expects 'A', worth 1);
+    // 'A' (its own score 1) placed in slot 1 (expects 'E', worth 3). Words
+    // match at both positions, so both slots' OWN scores (1 + 3 = 4) are
+    // awarded — full credit — not the dragged-in values' own scores.
+    expect(calculateOrderedScore(q, { order: ['E', 'A'] })).toBe(1);
+  });
 });
