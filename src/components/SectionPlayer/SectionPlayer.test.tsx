@@ -6,9 +6,10 @@ import { SectionPlayer } from './SectionPlayer';
 import type { PlayerConfig, Question, Section } from '../../types';
 
 // Capture ASSESS/RESPONSE telemetry so we can assert their arguments.
-const { logAnswerSubmitted, logResponse } = vi.hoisted(() => ({
+const { logAnswerSubmitted, logResponse, flushAssessEvents } = vi.hoisted(() => ({
   logAnswerSubmitted: vi.fn(),
   logResponse: vi.fn(),
+  flushAssessEvents: vi.fn(),
 }));
 vi.mock('../../context/useTelemetry', () => ({
   useTelemetry: () => ({
@@ -17,6 +18,8 @@ vi.mock('../../context/useTelemetry', () => ({
     logAnswerSubmitted,
     logPageViewed: vi.fn(),
     logResponse,
+    flushAssessEvents,
+    cancelAssessEvent: vi.fn(),
   }),
 }));
 
@@ -59,6 +62,13 @@ describe('SectionPlayer', () => {
     // no Submit (and no Next, since it's the last question).
     expect(screen.queryByRole('button', { name: /submit/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /next/i })).not.toBeInTheDocument();
+  });
+
+  it('flushes any debounced ASSESS event when navigating to the next question', () => {
+    flushAssessEvents.mockClear();
+    wrap(<SectionPlayer section={section} />);
+    fireEvent.click(screen.getByRole('button', { name: /next/i }));
+    expect(flushAssessEvents).toHaveBeenCalled();
   });
 
   it('persists an answer across navigation (Context restore)', () => {

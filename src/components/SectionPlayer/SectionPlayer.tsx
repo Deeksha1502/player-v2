@@ -41,8 +41,15 @@ interface SectionPlayerProps {
 
 export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: SectionPlayerProps) {
   const { state, storeAnswer, setCurrentQuestion } = useQuml();
-  const { logInteraction, logOptionSelected, logAnswerSubmitted, logPageViewed, logResponse } =
-    useTelemetry();
+  const {
+    logInteraction,
+    logOptionSelected,
+    logAnswerSubmitted,
+    logPageViewed,
+    logResponse,
+    flushAssessEvents,
+    cancelAssessEvent,
+  } = useTelemetry();
   const language = state.language;
 
   const questions: Question[] = section?.children ?? [];
@@ -74,6 +81,16 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
   useEffect(() => {
     slideEnteredAtRef.current = Date.now();
   }, [currentSlide]);
+
+  // ASSESS events are debounced per-question (telemetry-service.ts) — flush
+  // any pending one right before the slide changes again (internal Next/
+  // Previous, an external sidebar jump, or unmount), so a debounced answer
+  // isn't left waiting out its timer after the learner has already moved on.
+  useEffect(() => {
+    return () => {
+      flushAssessEvents();
+    };
+  }, [currentSlide, flushAssessEvents]);
 
   // Feedback dwell: how long the Correct/Wrong toast stays on the current
   // question before auto-advancing (see proceedWithFeedback).
@@ -109,8 +126,13 @@ export function SectionPlayer({ section, onSectionEnd, isLastSection = true }: S
     logOptionSelected(currentQuestion.identifier, selected as string | string[], currentSlide);
 
     // An empty response (e.g. everything de-selected, a cleared blank) is not an
-    // attempt: skip the ASSESS event so it isn't counted or scored.
-    if (!isAnswered(answer)) return;
+    // attempt: skip the ASSESS event so it isn't counted or scored, and cancel
+    // any earlier debounced ASSESS for this question so a stale value can't
+    // fire later.
+    if (!isAnswered(answer)) {
+      cancelAssessEvent(currentQuestion.identifier);
+      return;
+    }
 
     // calculateScore returns a 0..1 fraction; ASSESS must carry the EARNED marks
     // (fraction × maxScore) so the reported score/maxScore pair is consistent

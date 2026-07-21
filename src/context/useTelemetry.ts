@@ -16,6 +16,8 @@ import {
   raiseSummaryEvent,
   raiseErrorEvent,
   raiseResponseEvent,
+  flushPendingAssessEvents,
+  cancelPendingAssessEvent,
 } from '../services/telemetry-service';
 
 export function useTelemetry() {
@@ -232,6 +234,24 @@ export function useTelemetry() {
     [],
   );
 
+  /**
+   * Force immediate delivery of any debounced ASSESS event(s) — call before
+   * navigating away from a question or finalizing submission, so a fast
+   * type-then-submit doesn't lose the last answer to the debounce timer.
+   */
+  const flushAssessEvents = useCallback(() => {
+    flushPendingAssessEvents();
+  }, []);
+
+  /**
+   * Drop (without sending) a pending debounced ASSESS event for a question —
+   * call when the learner clears their answer back to empty, so a stale
+   * earlier value doesn't fire later.
+   */
+  const cancelAssessEvent = useCallback((questionId: string) => {
+    cancelPendingAssessEvent(questionId);
+  }, []);
+
   return {
     logInteraction,
     logOptionSelected,
@@ -242,5 +262,7 @@ export function useTelemetry() {
     logSummary,
     logError,
     logResponse,
+    flushAssessEvents,
+    cancelAssessEvent,
   };
 }

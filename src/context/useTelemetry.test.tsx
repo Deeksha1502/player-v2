@@ -36,9 +36,10 @@ describe('useTelemetry', () => {
 
   it('logAnswerSubmitted queues an ASSESS event matching the Sunbird item/index/pass/resvalues shape', () => {
     const { result } = renderHook(() => useTelemetry());
-    act(() =>
-      result.current.logAnswerSubmitted({ identifier: 'q3', qType: 'MCQ' }, 1, ['A'], 1, 2),
-    );
+    act(() => {
+      result.current.logAnswerSubmitted({ identifier: 'q3', qType: 'MCQ' }, 1, ['A'], 1, 2);
+      result.current.flushAssessEvents(); // ASSESS is debounced — force immediate dispatch
+    });
 
     const events = getQueuedEvents();
     expect(events).toHaveLength(1);
@@ -55,7 +56,10 @@ describe('useTelemetry', () => {
 
   it('logAnswerSubmitted marks pass:"Yes" when score meets maxScore', () => {
     const { result } = renderHook(() => useTelemetry());
-    act(() => result.current.logAnswerSubmitted({ identifier: 'q4', qType: 'MCQ' }, 2, ['B'], 2, 2));
+    act(() => {
+      result.current.logAnswerSubmitted({ identifier: 'q4', qType: 'MCQ' }, 2, ['B'], 2, 2);
+      result.current.flushAssessEvents();
+    });
 
     const events = getQueuedEvents();
     expect(events[0].edata).toMatchObject({ pass: 'Yes', score: 2 });
@@ -63,7 +67,7 @@ describe('useTelemetry', () => {
 
   it('logAnswerSubmitted includes item.title/sectionId and the real duration (Angular parity: section-player.component.ts edataItem/slideDuration)', () => {
     const { result } = renderHook(() => useTelemetry());
-    act(() =>
+    act(() => {
       result.current.logAnswerSubmitted(
         { identifier: 'q5', qType: 'MCQ', name: 'What is 2+2?' },
         1,
@@ -71,8 +75,9 @@ describe('useTelemetry', () => {
         1,
         1,
         { sectionId: 's1', durationSec: 3.5 },
-      ),
-    );
+      );
+      result.current.flushAssessEvents();
+    });
 
     const events = getQueuedEvents();
     expect(events[0].edata).toMatchObject({
