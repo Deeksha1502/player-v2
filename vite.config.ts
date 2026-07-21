@@ -92,11 +92,6 @@ export default defineConfig(({ command }) => {
             fileName: () => 'sunbird-quml-player.js',
             formats: ['iife'],
           },
-          rollupOptions: {
-            output: {
-              inlineDynamicImports: true,
-            },
-          },
           minify: 'terser',
           cssCodeSplit: false,
         }

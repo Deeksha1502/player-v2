@@ -101,14 +101,16 @@
   border-radius: var(--qp-r-pill);
   background: var(--qp-primary);
   color: v.$white;
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
-  font-weight: v.$fw-bold;
+  font-weight: v.$fw-regular;
 }
 
 .brandName {
+  font-family: var(--qp-font-sans);
   min-width: 0;
   font-size: v.$text-md;
-  font-weight: v.$fw-bold;
+  font-weight: v.$fw-regular;
   color: v.$g900;
   white-space: nowrap;
   overflow: hidden;

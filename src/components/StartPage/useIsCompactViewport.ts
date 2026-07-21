@@ -2,18 +2,24 @@ import { useEffect, useState } from 'react';
 import type { RefObject } from 'react';
 
 // Mirrors the SCSS `m.compact` mixin (styles/mixins.scss) — narrow width OR
-// short height. Kept in sync manually: SCSS can't export tokens to JS, and
-// this is the one piece of "mobile-app-only" behavior that can't be done in
-// pure CSS (it changes what's IN the DOM — paging the overview into two
-// screens — not just how existing DOM looks).
+// short-AND-narrow height. Kept in sync manually: SCSS can't export tokens to
+// JS, and this is the one piece of "mobile-app-only" behavior that can't be
+// done in pure CSS (it changes what's IN the DOM — paging the overview into
+// two screens — not just how existing DOM looks).
 const MOBILE_MAX_WIDTH = 768;
 const SHORT_MAX_HEIGHT = 720;
+// Gates the short-height check so a merely-unmaximized (short but wide)
+// desktop window isn't mistaken for a real device in landscape — see
+// mixins.scss's `m.compact` comment for the matching CSS-side rationale.
+const SHORT_MAX_WIDTH = 950;
 
 /**
  * True when the player is effectively rendering as the mobile app — narrow
  * width (container-based, so it also matches the editor's mobile preview) OR
- * a short viewport (a real device in landscape). False on portal/desktop/
- * editor-desktop-preview, where nothing here should change behavior.
+ * a short AND narrow viewport (a real device in landscape). False on portal/
+ * desktop/editor-desktop-preview — including a merely-unmaximized desktop
+ * window, which is short but not narrow — where nothing here should change
+ * behavior.
  */
 export function useIsCompactViewport(containerRef: RefObject<HTMLElement>): boolean {
   const [isCompact, setIsCompact] = useState(false);
@@ -27,7 +33,9 @@ export function useIsCompactViewport(containerRef: RefObject<HTMLElement>): bool
       return;
     }
 
-    const heightQuery = window.matchMedia(`(max-height: ${SHORT_MAX_HEIGHT}px)`);
+    const heightQuery = window.matchMedia(
+      `(max-height: ${SHORT_MAX_HEIGHT}px) and (max-width: ${SHORT_MAX_WIDTH}px)`,
+    );
     const update = () => {
       const width = el.getBoundingClientRect().width;
       setIsCompact(width <= MOBILE_MAX_WIDTH || heightQuery.matches);
