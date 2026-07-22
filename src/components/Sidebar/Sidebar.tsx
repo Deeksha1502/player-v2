@@ -62,8 +62,15 @@ export function Sidebar({
                   <span className={styles.name}>{name}</span>
                   {blurb && <span className={styles.blurb}>{blurb}</span>}
                   <span className={styles.status}>
-                    <span className={styles.answered}>● {answered}</span>
-                    <span className={styles.remaining}>○ {total - answered}</span>
+                    <span className={styles.answered} aria-label={`${t(language, 'ANSWERED')} ${answered}`}>
+                      <span aria-hidden="true">● {answered}</span>
+                    </span>
+                    <span
+                      className={styles.remaining}
+                      aria-label={`${t(language, 'UNANSWERED')} ${total - answered}`}
+                    >
+                      <span aria-hidden="true">○ {total - answered}</span>
+                    </span>
                   </span>
                 </span>
               </button>

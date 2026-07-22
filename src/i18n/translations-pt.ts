@@ -114,7 +114,7 @@ export const translations: Record<string, string> = {
 
   // Results & Review (Phase 7)
   SUBMIT_TITLE: 'Enviar sua avaliação?',
-  SUBMIT_BODY: 'Você pode revisar suas respostas durante o envio.',
+  SUBMIT_BODY: 'Você pode revisar suas respostas antes de enviar.',
   CONFIRM: 'Confirmar',
   CANCEL: 'Cancelar',
   YOUR_RESULTS: 'Seus resultados',

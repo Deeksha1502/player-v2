@@ -190,15 +190,20 @@ export function PlayerHeader({
         </span>
 
         {onReview && (
-          <button
-            type="button"
-            className={styles.reviewBtn}
-            onClick={onReview}
-            disabled={!reviewAvailable}
-            title={reviewAvailable ? undefined : t(language, 'REVIEW_AVAILABLE_AT_END')}
-          >
-            {t(language, 'REVIEW')}
-          </button>
+          // The tooltip lives on this wrapping span, not the button itself —
+          // disabled buttons generally don't show their own `title` (and
+          // aren't focusable), so the explanation would otherwise be
+          // impossible to discover on hover.
+          <span title={reviewAvailable ? undefined : t(language, 'REVIEW_AVAILABLE_AT_END')}>
+            <button
+              type="button"
+              className={styles.reviewBtn}
+              onClick={onReview}
+              disabled={!reviewAvailable}
+            >
+              {t(language, 'REVIEW')}
+            </button>
+          </span>
         )}
 
         <button type="button" className={styles.submitBtn} onClick={onSubmit}>

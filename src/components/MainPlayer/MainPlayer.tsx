@@ -573,7 +573,10 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
     if (stage !== 'overview' || state.sections.length === 0) return;
     // Attempts exhausted — fall back to the overview (with its disabled
     // Start/Resume CTA) instead of auto-starting into another attempt.
-    if (maxAttempts != null && state.attemptNumber >= maxAttempts) return;
+    // attemptNumber is 1-indexed (this upcoming attempt's ordinal), so the
+    // last allowed attempt (attemptNumber === maxAttempts) must still be
+    // allowed to auto-start — only exceeding it should be blocked.
+    if (maxAttempts != null && state.attemptNumber > maxAttempts) return;
     autoStartedRef.current = true;
     setCurrentSection(0);
     setCurrentQuestion(0);
