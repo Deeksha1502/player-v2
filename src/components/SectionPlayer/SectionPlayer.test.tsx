@@ -6,9 +6,10 @@ import { SectionPlayer } from './SectionPlayer';
 import type { PlayerConfig, Question, Section } from '../../types';
 
 // Capture ASSESS/RESPONSE telemetry so we can assert their arguments.
-const { logAnswerSubmitted, logResponse } = vi.hoisted(() => ({
+const { logAnswerSubmitted, logResponse, flushAssessEvent } = vi.hoisted(() => ({
   logAnswerSubmitted: vi.fn(),
   logResponse: vi.fn(),
+  flushAssessEvent: vi.fn(),
 }));
 vi.mock('../../context/useTelemetry', () => ({
   useTelemetry: () => ({
@@ -17,6 +18,8 @@ vi.mock('../../context/useTelemetry', () => ({
     logAnswerSubmitted,
     logPageViewed: vi.fn(),
     logResponse,
+    flushAssessEvent,
+    cancelAssessEvent: vi.fn(),
   }),
 }));
 
@@ -59,6 +62,42 @@ describe('SectionPlayer', () => {
     // no Submit (and no Next, since it's the last question).
     expect(screen.queryByRole('button', { name: /submit/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /next/i })).not.toBeInTheDocument();
+  });
+
+  it('flushes the LEAVING question\'s debounced ASSESS event when navigating to the next question', () => {
+    flushAssessEvent.mockClear();
+    wrap(<SectionPlayer section={section} />);
+    fireEvent.click(screen.getByRole('button', { name: /next/i }));
+    // Leaving q1 (not q2, the one being entered) — scoped, not a global flush.
+    expect(flushAssessEvent).toHaveBeenCalledWith('q1');
+  });
+
+  it('flushes the outgoing question\'s debounced ASSESS event across a section boundary (remount, not just a slide-index change)', () => {
+    // MainPlayer.tsx keys SectionPlayer by section index — moving to a new
+    // section is a real unmount of the old instance + mount of a new one,
+    // not just a currentSlide state change within the same instance.
+    flushAssessEvent.mockClear();
+    const sectionB: Section = {
+      identifier: 's2',
+      name: 'Section 2',
+      children: [mcq('q3'), mcq('q4')],
+      timeLimits: { max: 0, min: 0 },
+      allowSkip: true,
+      shuffle: false,
+    };
+    const { rerender } = render(
+      <QumlProvider playerConfig={cfg}>
+        <SectionPlayer key="a" section={section} />
+      </QumlProvider>,
+    );
+    expect(flushAssessEvent).not.toHaveBeenCalled();
+    rerender(
+      <QumlProvider playerConfig={cfg}>
+        <SectionPlayer key="b" section={sectionB} />
+      </QumlProvider>,
+    );
+    // The outgoing instance was on q1 when it unmounted.
+    expect(flushAssessEvent).toHaveBeenCalledWith('q1');
   });
 
   it('persists an answer across navigation (Context restore)', () => {

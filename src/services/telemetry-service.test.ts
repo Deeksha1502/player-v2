@@ -1,7 +1,11 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import {
   initializeTelemetry,
   raiseInteractEvent,
+  raiseAssessEvent,
+  flushPendingAssessEvents,
+  flushPendingAssessEvent,
+  cancelPendingAssessEvent,
   subscribeTelemetry,
   getQueuedEvents,
   clearEventQueue,
@@ -88,6 +92,118 @@ describe('telemetry-service — SDK method guards', () => {
     raiseInteractEvent({ a: 1 });
 
     expect(typeof received[0].ets).toBe('number');
+    unsub();
+  });
+});
+
+describe('telemetry-service — ASSESS debounce (FTB/MTF/SEQ/REO fire per keystroke/step)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    initializeTelemetry(ctx);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('debounces repeated calls for the same question, dispatching only the last value after 2s', () => {
+    const received: { edata: unknown }[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e as { edata: unknown }));
+
+    raiseAssessEvent({ item: { id: 'q1' }, resvalues: [{ value: 'p' }] });
+    raiseAssessEvent({ item: { id: 'q1' }, resvalues: [{ value: 'pa' }] });
+    raiseAssessEvent({ item: { id: 'q1' }, resvalues: [{ value: 'paris' }] });
+    expect(received).toHaveLength(0); // nothing dispatched yet
+
+    vi.advanceTimersByTime(2000);
+    expect(received).toHaveLength(1);
+    expect(received[0].edata).toEqual({ item: { id: 'q1' }, resvalues: [{ value: 'paris' }] });
+    unsub();
+  });
+
+  it('debounces two different questions independently', () => {
+    const received: { edata: { item: { id: string } } }[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e as { edata: { item: { id: string } } }));
+
+    raiseAssessEvent({ item: { id: 'q1' }, resvalues: [{ value: 'a' }] });
+    raiseAssessEvent({ item: { id: 'q2' }, resvalues: [{ value: 'b' }] });
+    vi.advanceTimersByTime(2000);
+
+    expect(received).toHaveLength(2);
+    expect(received.map((e) => e.edata.item.id).sort()).toEqual(['q1', 'q2']);
+    unsub();
+  });
+
+  it('flushPendingAssessEvents dispatches immediately, bypassing the timer', () => {
+    const received: unknown[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e));
+
+    raiseAssessEvent({ item: { id: 'q1' }, resvalues: [{ value: 'paris' }] });
+    expect(received).toHaveLength(0);
+
+    flushPendingAssessEvents();
+    expect(received).toHaveLength(1);
+
+    // The timer that would have fired later must not double-dispatch.
+    vi.advanceTimersByTime(2000);
+    expect(received).toHaveLength(1);
+    unsub();
+  });
+
+  it('cancelPendingAssessEvent drops a pending event with no dispatch (answer cleared to empty)', () => {
+    const received: unknown[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e));
+
+    raiseAssessEvent({ item: { id: 'q1' }, resvalues: [{ value: 'paris' }] });
+    cancelPendingAssessEvent('q1');
+    vi.advanceTimersByTime(2000);
+
+    expect(received).toHaveLength(0);
+    unsub();
+  });
+
+  it('ets/timestamp reflect the original interaction time, not the later flush/dispatch time', () => {
+    const received: { ets: number; timestamp: number }[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e as { ets: number; timestamp: number }));
+
+    vi.setSystemTime(1_000_000);
+    raiseAssessEvent({ item: { id: 'q1' }, resvalues: [{ value: 'paris' }] });
+
+    // Time passes before the debounce timer actually fires.
+    vi.setSystemTime(1_000_000 + 5_000);
+    vi.advanceTimersByTime(2000);
+
+    expect(received).toHaveLength(1);
+    expect(received[0].ets).toBe(1_000_000);
+    expect(received[0].timestamp).toBe(1_000_000);
+    unsub();
+  });
+
+  it('flushPendingAssessEvent(questionId) flushes only that question, leaving another pending question untouched', () => {
+    const received: { edata: { item: { id: string } } }[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e as { edata: { item: { id: string } } }));
+
+    raiseAssessEvent({ item: { id: 'q1' }, resvalues: [{ value: 'a' }] });
+    raiseAssessEvent({ item: { id: 'q2' }, resvalues: [{ value: 'b' }] });
+
+    flushPendingAssessEvent('q1');
+    expect(received).toHaveLength(1);
+    expect(received[0].edata.item.id).toBe('q1');
+
+    // q2 is still pending — its own timer fires later, undisturbed.
+    vi.advanceTimersByTime(2000);
+    expect(received).toHaveLength(2);
+    expect(received[1].edata.item.id).toBe('q2');
+    unsub();
+  });
+
+  it('dispatches immediately, bypassing the debounce timer, when there is no question id to coalesce by', () => {
+    const received: unknown[] = [];
+    const unsub = subscribeTelemetry((e) => received.push(e));
+
+    raiseAssessEvent({ resvalues: [{ value: 'no item id here' }] });
+
+    expect(received).toHaveLength(1); // no vi.advanceTimersByTime needed
     unsub();
   });
 });

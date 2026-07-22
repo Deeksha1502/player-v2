@@ -78,6 +78,29 @@ let telemetrySDK: any = null;
 let eventQueue: TelemetryEvent[] = [];
 
 /**
+ * ASSESS debounce — FTB/MTF/SEQ/REO fire ASSESS on every keystroke/drag step
+ * (Angular parity), so a single question can generate many events before the
+ * learner moves on. Debouncing the DISPATCH (not answer storage, which stays
+ * instant for the UI) to a quiet period per question cuts this to essentially
+ * one event per question in the common case. flushPendingAssessEvents/
+ * cancelPendingAssessEvent let callers force immediate delivery (navigating
+ * away, submitting) or drop a stale pending value (answer cleared to empty)
+ * without waiting out the timer.
+ */
+const ASSESS_DEBOUNCE_MS = 2000;
+const pendingAssessTimers = new Map<string, ReturnType<typeof setTimeout>>();
+// Stores the fully-built event (ets/timestamp already stamped at the
+// original raiseAssessEvent call), not raw edata — so a debounced event
+// reports when the learner actually interacted, not when the timer happened
+// to fire later.
+const pendingAssessData = new Map<string, TelemetryEvent>();
+
+function assessKey(data: unknown): string {
+  const item = (data as { item?: { id?: string } } | null)?.item;
+  return item?.id ?? '';
+}
+
+/**
  * Sunbird v3 telemetry `object`/`context` envelope, built once per
  * `initializeTelemetry` call and reused by every raise* call. `null` when no
  * (or an empty) context was provided — matches Angular's
@@ -297,14 +320,86 @@ export function raiseInteractEvent(data: unknown): void {
   }
 }
 
-/** Raise an ASSESS event (answer submission). */
-export function raiseAssessEvent(data: unknown): void {
-  const event: TelemetryEvent = { eid: 'ASSESS', edata: data, timestamp: Date.now(), ets: Date.now() };
+/** Sends an already-built ASSESS event — timestamps are captured by the
+ * caller at the original interaction time, not here. */
+function dispatchAssessEvent(event: TelemetryEvent): void {
   sendToSdk(event);
   emit(event);
   if (csEventOptions) {
-    CsTelemetryModule.instance.telemetryService.raiseAssesTelemetry(data, csEventOptions);
+    CsTelemetryModule.instance.telemetryService.raiseAssesTelemetry(event.edata, csEventOptions);
   }
+}
+
+/**
+ * Raise an ASSESS event (answer submission), debounced per-question — see
+ * the ASSESS debounce note above `pendingAssessTimers`. Repeated calls for
+ * the same question reset the timer and keep only the latest value; call
+ * flushPendingAssessEvent(questionId)/flushPendingAssessEvents() to force
+ * immediate delivery. `ets`/`timestamp` are stamped NOW, at the moment the
+ * learner actually answered — not later when the timer fires — so a
+ * debounced event still reports the real interaction time.
+ */
+export function raiseAssessEvent(data: unknown): void {
+  const key = assessKey(data);
+  const event: TelemetryEvent = { eid: 'ASSESS', edata: data, timestamp: Date.now(), ets: Date.now() };
+  if (!key) {
+    // No question id to sensibly coalesce by — dispatch immediately rather
+    // than sharing one bucket with unrelated malformed events.
+    dispatchAssessEvent(event);
+    return;
+  }
+  const existing = pendingAssessTimers.get(key);
+  if (existing) clearTimeout(existing);
+  pendingAssessData.set(key, event);
+  pendingAssessTimers.set(
+    key,
+    setTimeout(() => {
+      pendingAssessTimers.delete(key);
+      pendingAssessData.delete(key);
+      dispatchAssessEvent(event);
+    }, ASSESS_DEBOUNCE_MS),
+  );
+}
+
+/**
+ * Immediately dispatch (and stop debouncing) every pending ASSESS event —
+ * call before finalizing submission, so a fast type-then-submit doesn't
+ * lose the last answer to the debounce timer. Flushes ALL questions, not
+ * just one — appropriate for "the whole assessment is ending," but prefer
+ * flushPendingAssessEvent(questionId) when only one question is relevant
+ * (e.g. navigating away from it), so navigating away from Q1 doesn't also
+ * force-flush an unrelated still-pending Q5.
+ */
+export function flushPendingAssessEvents(): void {
+  pendingAssessTimers.forEach((timer) => clearTimeout(timer));
+  pendingAssessTimers.clear();
+  pendingAssessData.forEach((event) => dispatchAssessEvent(event));
+  pendingAssessData.clear();
+}
+
+/**
+ * Immediately dispatch (and stop debouncing) the pending ASSESS event for
+ * ONE question, leaving any other pending question's timer untouched.
+ */
+export function flushPendingAssessEvent(questionId: string): void {
+  const existing = pendingAssessTimers.get(questionId);
+  if (existing) clearTimeout(existing);
+  pendingAssessTimers.delete(questionId);
+  const event = pendingAssessData.get(questionId);
+  pendingAssessData.delete(questionId);
+  if (event) dispatchAssessEvent(event);
+}
+
+/**
+ * Cancel (without sending) any pending ASSESS event for a question — e.g.
+ * when the learner clears their answer back to empty; a stale earlier value
+ * must not fire later.
+ */
+export function cancelPendingAssessEvent(questionId: string): void {
+  const existing = pendingAssessTimers.get(questionId);
+  if (existing) clearTimeout(existing);
+  pendingAssessTimers.delete(questionId);
+  pendingAssessData.delete(questionId);
 }
 
 /** Raise an IMPRESSION event (page view). */

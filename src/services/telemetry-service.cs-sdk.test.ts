@@ -44,6 +44,7 @@ const {
   initializeTelemetry,
   raiseInteractEvent,
   raiseAssessEvent,
+  flushPendingAssessEvents,
   raiseImpressionEvent,
   raiseStartEvent,
   raiseEndEvent,
@@ -164,6 +165,7 @@ describe('telemetry-service — CS SDK integration', () => {
   it('raiseAssessEvent forwards to raiseAssesTelemetry(data, options)', () => {
     initializeTelemetry(fullContext as any);
     raiseAssessEvent({ type: 'assess', questionId: 'q1', score: 1, maxScore: 1 });
+    flushPendingAssessEvents(); // ASSESS is debounced — force immediate dispatch
 
     expect(raiseAssesTelemetry).toHaveBeenCalledTimes(1);
     const [data, options] = raiseAssesTelemetry.mock.calls[0];
