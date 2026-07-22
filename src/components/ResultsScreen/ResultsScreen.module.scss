@@ -33,6 +33,7 @@
 }
 
 .title {
+  font-family: var(--qp-font-sans);
   margin: 0 0 v.$space-6;
   font-size: v.$text-2xl;
   font-weight: v.$fw-bold;
@@ -63,22 +64,6 @@
 
   @include m.short {
     margin-top: v.$space-3;
-  }
-}
-
-.reviewBtn {
-  @include m.button-base;
-  @include m.focus-ring($color: v.$g700);
-
-  background: var(--qp-primary);
-  color: v.$white;
-
-  &:hover:not(:disabled) {
-    background: var(--qp-primary-hover);
-  }
-
-  @include m.short {
-    padding: v.$space-2 v.$space-4;
   }
 }
 

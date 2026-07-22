@@ -46,6 +46,7 @@
 }
 
 .title {
+  font-family: var(--qp-font-sans);
   margin: 0;
   font-size: v.$text-lg;
   font-weight: v.$fw-bold;
@@ -101,6 +102,7 @@
 }
 
 .countLabel {
+  font-family: var(--qp-font-sans);
   font-size: v.$text-xs;
   font-weight: v.$fw-semibold;
   text-transform: uppercase;
@@ -108,6 +110,7 @@
 }
 
 .countValue {
+  font-family: var(--qp-font-sans);
   margin: v.$space-1 0 0;
   font-size: v.$text-2xl;
   font-weight: v.$fw-bold;

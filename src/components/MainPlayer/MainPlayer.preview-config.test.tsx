@@ -111,7 +111,7 @@ describe('MainPlayer — preview parity (showStartPage / requiresSubmit)', () =>
       act(() => vi.advanceTimersByTime(1000)); // feedback dwell then proceed
       // No confirmation dialog — straight to the results screen.
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /review all answers/i })).toBeInTheDocument();
+      expect(screen.getByRole('region', { name: /your results/i })).toBeInTheDocument();
     } finally {
       vi.useRealTimers();
     }

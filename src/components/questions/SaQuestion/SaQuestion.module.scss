@@ -10,6 +10,7 @@
 
 // "Question" / "Answer" section labels (deep-teal heading, like the design).
 .label {
+  font-family: var(--qp-font-sans);
   margin: 0;
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;

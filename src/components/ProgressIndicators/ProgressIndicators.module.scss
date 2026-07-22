@@ -14,6 +14,7 @@
 }
 
 .progressLabel {
+  font-family: var(--qp-font-sans);
   font-size: v.$text-xs;
   font-weight: v.$fw-semibold;
   color: v.$g600;
@@ -22,6 +23,7 @@
 }
 
 .progressCount {
+  font-family: var(--qp-font-sans);
   font-size: v.$text-xs;
   font-weight: v.$fw-medium;
   color: v.$g500;

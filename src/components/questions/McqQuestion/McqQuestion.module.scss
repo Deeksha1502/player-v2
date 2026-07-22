@@ -14,12 +14,14 @@
 }
 
 // Editor-authored layout (question.templateId: mcq-vertical/-grid/-horizontal).
-// `.options` above stays the vertical (default) case.
+// `.options` above stays the vertical (default) case. Grid/horizontal stay
+// 2-up down to very narrow phones (see m.mobile-xs), below which there isn't
+// enough room per column and they fall back to the single-column default.
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 
-  @include m.mobile {
+  @include m.mobile-xs {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -29,8 +31,19 @@
   flex-wrap: wrap;
 
   .option {
-    flex: 1 1 auto;
+    // Fixed 2-up basis (not `flex: 1 1 auto`) — otherwise, once a row only
+    // fits one item (narrow/mobile widths), that item's flex-grow stretches
+    // it to 100%, which looks identical to the default vertical stack.
+    flex: 0 1 calc(50% - #{v.$space-3} / 2);
     min-width: 0;
+  }
+
+  @include m.mobile-xs {
+    flex-direction: column;
+
+    .option {
+      flex: 1 1 auto;
+    }
   }
 }
 
@@ -98,6 +111,7 @@
 }
 
 .alpha {
+  font-family: var(--qp-font-sans);
   min-width: 20px;
   font-weight: v.$fw-bold;
   font-size: v.$text-xs;
@@ -106,7 +120,9 @@
 
 .label {
   flex: 1;
+  min-width: 0;
   line-height: v.$lh-snug;
+  overflow-wrap: anywhere;
 
   :global(p) {
     margin: 0;
@@ -114,6 +130,7 @@
 }
 
 .review {
+  font-family: var(--qp-font-sans);
   padding: v.$space-3;
   background: v.$success-bg;
   border-inline-start: 3px solid v.$success;

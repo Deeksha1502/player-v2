@@ -25,10 +25,17 @@
 }
 
 .title {
+  font-family: var(--qp-font-sans);
   margin: 0;
   font-size: v.$text-lg;
   font-weight: v.$fw-bold;
   color: v.$g900;
+}
+
+.topbarActions {
+  display: flex;
+  align-items: center;
+  gap: v.$space-3;
 }
 
 .exitBtn {
@@ -42,6 +49,18 @@
   &:hover:not(:disabled) {
     border-color: v.$g400;
     background: v.$cream-bg;
+  }
+}
+
+.submitBtn {
+  @include m.button-base;
+  @include m.focus-ring($color: v.$g700);
+
+  background: var(--qp-primary);
+  color: v.$white;
+
+  &:hover:not(:disabled) {
+    background: var(--qp-primary-hover);
   }
 }
 
@@ -99,6 +118,7 @@
 }
 
 .verdict {
+  font-family: var(--qp-font-sans);
   align-self: center;
   margin-bottom: v.$space-5;
   padding: v.$space-2 v.$space-5;
@@ -152,6 +172,7 @@
 }
 
 .counter {
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-medium;
   color: v.$g600;

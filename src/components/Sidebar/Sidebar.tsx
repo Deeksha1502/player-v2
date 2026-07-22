@@ -62,7 +62,7 @@ export function Sidebar({
                   <span className={styles.name}>{name}</span>
                   {blurb && <span className={styles.blurb}>{blurb}</span>}
                   <span className={styles.status}>
-                    <span className={styles.answered}>✓ {answered}</span>
+                    <span className={styles.answered}>● {answered}</span>
                     <span className={styles.remaining}>○ {total - answered}</span>
                   </span>
                 </span>

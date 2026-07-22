@@ -15,6 +15,7 @@
 }
 
 .label {
+  font-family: var(--qp-font-sans);
   margin: 0 0 v.$space-4 v.$space-1;
   font-size: v.$text-xs;
   font-weight: v.$fw-bold;
@@ -60,7 +61,7 @@
 
 // ── Letter badge ─────────────────────────────────────────────────────────────
 .badge {
-  position: relative;
+  font-family: var(--qp-font-sans);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,29 +73,11 @@
   color: v.$gray-500;
   font-size: v.$text-sm;
   font-weight: v.$fw-bold;
-
-  // Small accent dot (bottom-right).
-  &::after {
-    content: '';
-    position: absolute;
-    right: -1px;
-    bottom: -1px;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: var(--qp-r-pill);
-    background: v.$ginger;
-    border: 1.5px solid v.$white;
-  }
 }
 
 .badgeActive {
   background: var(--qp-primary);
   color: v.$white;
-
-  &::after {
-    background: v.$sunflower;
-    border-color: v.$ivory;
-  }
 }
 
 // ── Text ─────────────────────────────────────────────────────────────────────
@@ -113,11 +96,13 @@
 }
 
 .blurb {
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   color: v.$gray-500;
 }
 
 .status {
+  font-family: var(--qp-font-sans);
   display: flex;
   gap: v.$space-4;
   margin-top: v.$space-1;
@@ -127,7 +112,7 @@
 }
 
 .answered {
-  color: v.$success;
+  color: var(--qp-primary);
 }
 
 .remaining {

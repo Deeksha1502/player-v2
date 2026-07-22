@@ -98,6 +98,7 @@ export const translations: Record<string, string> = {
   START_ASSESSMENT: 'Commencer l’évaluation',
   RESUME_ASSESSMENT: 'Reprendre l’évaluation',
   ATTEMPTS_LEFT: 'Tentatives restantes',
+  MAX_ATTEMPTS_REACHED: 'Vous avez utilisé toutes vos tentatives pour cette évaluation.',
   MINUTES_LABEL: 'Minutes',
   NO_LIMIT: 'Sans limite',
   TIMER_START_NOTE:
@@ -113,14 +114,15 @@ export const translations: Record<string, string> = {
 
   // Results & Review (Phase 7)
   SUBMIT_TITLE: 'Soumettre votre évaluation ?',
-  SUBMIT_BODY: 'Vous pourrez revoir vos réponses après la soumission.',
+  SUBMIT_BODY: 'Vous pouvez revoir vos réponses lors de la soumission.',
   CONFIRM: 'Confirmer',
   CANCEL: 'Annuler',
   YOUR_RESULTS: 'Vos résultats',
-  REVIEW_ALL: 'Revoir toutes les réponses',
   RETAKE: 'Recommencer',
   REVIEW: 'Revoir',
+  REVIEW_AVAILABLE_AT_END: 'Vous pourrez revoir vos réponses à la dernière question',
   BACK_TO_RESULTS: 'Retour aux résultats',
+  BACK_TO_ASSESSMENT: "Retour à l'évaluation",
   RESULT_SUMMARY: 'Vous avez obtenu {score} sur {max}.',
   ANSWER: 'Réponse',
 

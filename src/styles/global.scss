@@ -11,6 +11,21 @@
   box-sizing: border-box;
 }
 
+// Browsers don't inherit font-family/size/etc. into form controls by default
+// (they apply their own UI font instead) — without this, EVERY button/input in
+// the app silently falls back to the browser's default font regardless of what
+// the rest of the page uses, no matter what font-family is set on ancestors or
+// even on the control's own children. This was the root cause of the portal's
+// bridged font (and Satisfy specifically) not applying inside any <button>
+// (Sidebar's section cards, McqQuestion's options, etc.) — every text node
+// nested inside a button inherited the browser's UI font, not the page's.
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
 html,
 body,
 #root {

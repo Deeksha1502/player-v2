@@ -38,6 +38,7 @@
 
 // ── Letter badge ─────────────────────────────────────────────────────────────
 .badge {
+  font-family: var(--qp-font-sans);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,6 +46,7 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: var(--qp-r-pill);
+  background: var(--qp-primary);
   color: v.$white;
   font-size: v.$text-base;
   font-weight: v.$fw-bold;
@@ -107,6 +109,7 @@
 }
 
 .title {
+  font-family: var(--qp-font-sans);
   margin: 0 0 v.$space-4;
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: v.$fw-bold;
@@ -256,6 +259,7 @@
 }
 
 .statLabel {
+  font-family: var(--qp-font-sans);
   font-size: v.$text-xs;
   font-weight: v.$fw-semibold;
   letter-spacing: 0.06em;
@@ -265,6 +269,7 @@
 }
 
 .statValue {
+  font-family: var(--qp-font-sans);
   margin: 0;
   font-size: v.$text-xl;
   font-weight: v.$fw-bold;
@@ -332,6 +337,7 @@
 }
 
 .sectionsHeading {
+  font-family: var(--qp-font-sans);
   margin: 0 0 v.$space-2;
   font-size: v.$text-xl;
   font-weight: v.$fw-bold;
@@ -426,6 +432,7 @@ button.sectionCard {
 }
 
 .cardName {
+  font-family: var(--qp-font-sans);
   flex: 1;
   min-width: 0;
   font-size: v.$text-base;
@@ -472,8 +479,14 @@ button.sectionCard {
   cursor: pointer;
   transition: background v.$dur-fast v.$ease-out;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: var(--qp-primary-hover);
+  }
+
+  &:disabled {
+    background: v.$gray-300;
+    color: v.$gray-500;
+    cursor: not-allowed;
   }
 
   @include m.short {

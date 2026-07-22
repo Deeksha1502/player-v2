@@ -26,6 +26,18 @@ export interface PlayerHeaderProps {
   questionNumber: number;
   totalQuestions: number;
   onSubmit: () => void;
+  /**
+   * Entry point into the (editable, pre-submit) review screen — independent
+   * of whether the Submit button shows a confirmation dialog. Omit to hide
+   * the button entirely.
+   */
+  onReview?: () => void;
+  /**
+   * Review is only actionable on the last question of the last section; the
+   * button stays visible everywhere so it's discoverable, but is disabled
+   * (with a tooltip) until then. Defaults to true (enabled) when omitted.
+   */
+  reviewAvailable?: boolean;
   onMenuClick?: () => void;
   /** Click the brand to return to the overview / start page. */
   onBrandClick?: () => void;
@@ -55,6 +67,8 @@ export function PlayerHeader({
   questionNumber,
   totalQuestions,
   onSubmit,
+  onReview,
+  reviewAvailable = true,
   onMenuClick,
   onBrandClick,
   sectionLabel,
@@ -158,6 +172,14 @@ export function PlayerHeader({
                   <span className={`${styles.legendDot} ${styles.upcoming}`} aria-hidden="true">B</span>
                   <span>{t(language, 'SECTION_UPCOMING')}</span>
                 </div>
+                <div className={styles.legendItem}>
+                  <span className={`${styles.legendMark} ${styles.answered}`} aria-hidden="true">●</span>
+                  <span>{t(language, 'ANSWERED')}</span>
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={`${styles.legendMark} ${styles.unanswered}`} aria-hidden="true">○</span>
+                  <span>{t(language, 'UNANSWERED')}</span>
+                </div>
               </div>
             </>
           )}
@@ -166,6 +188,18 @@ export function PlayerHeader({
         <span className={styles.counter}>
           {questionNumber}/{totalQuestions}
         </span>
+
+        {onReview && (
+          <button
+            type="button"
+            className={styles.reviewBtn}
+            onClick={onReview}
+            disabled={!reviewAvailable}
+            title={reviewAvailable ? undefined : t(language, 'REVIEW_AVAILABLE_AT_END')}
+          >
+            {t(language, 'REVIEW')}
+          </button>
+        )}
 
         <button type="button" className={styles.submitBtn} onClick={onSubmit}>
           {t(language, 'SUBMIT')}

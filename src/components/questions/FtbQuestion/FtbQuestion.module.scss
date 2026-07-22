@@ -2,7 +2,7 @@
 @use '../../../styles/mixins' as m;
 
 .ftb {
-  font-family: v.$ff-question;
+  font-family: var(--qp-font-sans);
 
   // In an RTL UI the sentence block aligns right (dir="auto" on the container
   // still keeps English-fallback character order intact).

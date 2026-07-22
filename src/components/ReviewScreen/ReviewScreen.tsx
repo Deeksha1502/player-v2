@@ -13,7 +13,8 @@ import type { Question, Section, AnswersMap, UserResponse } from '../../types';
 import styles from './ReviewScreen.module.scss';
 
 /**
- * ReviewScreen — per-question review (spec §7.3/§7.4).
+ * ReviewScreen — per-question review, reached pre-submit from the header's
+ * persistent Review button (spec §7.3/§7.4).
  *
  * Uses the same section `Sidebar` as the assessment shell (so review navigation
  * matches the player) and `QuestionRenderer` to render each question with its
@@ -21,6 +22,8 @@ import styles from './ReviewScreen.module.scss';
  * re-answering updates the stored answer in Context, so the verdict/score update
  * live. Correctness is derived via the `scoring-registry` (no scoring logic
  * duplicated). A section jump lands on that section's first question.
+ * `onSubmit` finalizes the assessment from here, once the learner is done
+ * checking/changing answers.
  */
 export interface ReviewScreenProps {
   questions: Question[];
@@ -29,6 +32,10 @@ export interface ReviewScreenProps {
   answers: AnswersMap;
   startIndex?: number;
   onExit: () => void;
+  /** Overrides the exit button's label (defaults to "Back to results"). */
+  exitLabel?: string;
+  /** Renders a Submit action that finalizes the assessment from here. */
+  onSubmit?: () => void;
   language?: string;
 }
 
@@ -73,6 +80,8 @@ export function ReviewScreen({
   answers,
   startIndex = 0,
   onExit,
+  exitLabel,
+  onSubmit,
   language = 'en',
 }: ReviewScreenProps) {
   const { state, storeAnswer } = useQuml();
@@ -123,9 +132,16 @@ export function ReviewScreen({
     <section className={styles.review} aria-label={t(language, 'REVIEW')}>
       <header className={styles.topbar}>
         <h1 className={styles.title}>{t(language, 'REVIEW')}</h1>
-        <button type="button" className={styles.exitBtn} onClick={onExit}>
-          {t(language, 'BACK_TO_RESULTS')}
-        </button>
+        <div className={styles.topbarActions}>
+          <button type="button" className={styles.exitBtn} onClick={onExit}>
+            {exitLabel ?? t(language, 'BACK_TO_RESULTS')}
+          </button>
+          {onSubmit && (
+            <button type="button" className={styles.submitBtn} onClick={onSubmit}>
+              {t(language, 'SUBMIT')}
+            </button>
+          )}
+        </div>
       </header>
 
       <div className={styles.body}>
@@ -187,9 +203,9 @@ export function ReviewScreen({
             <Hint
               hints={question.hints}
               solutions={question.solutions}
-              // In review the assessment is complete, so solutions are always
-              // unlocked (canViewSolution) — but still gated by the section's
-              // showHints/showSolutions flags, consistent with the live section.
+              // Solutions are always unlocked in review (canViewSolution) — but
+              // still gated by the section's showHints/showSolutions flags,
+              // consistent with the live section.
               canViewSolution
               showHints={currentSection?.showHints}
               showSolutions={currentSection?.showSolutions}

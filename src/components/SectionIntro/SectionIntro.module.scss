@@ -116,6 +116,7 @@
 }
 
 .bannerBadge {
+  font-family: var(--qp-font-sans);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -141,6 +142,7 @@
 }
 
 .bannerEyebrow {
+  font-family: var(--qp-font-sans);
   margin: 0 0 v.$space-1;
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;
@@ -150,6 +152,7 @@
 }
 
 .bannerTitle {
+  font-family: var(--qp-font-sans);
   margin: 0;
   font-size: clamp(1.25rem, 3.5vw, #{v.$text-xl});
   font-weight: v.$fw-bold;
@@ -216,6 +219,7 @@
 }
 
 .instructionsHeading {
+  font-family: var(--qp-font-sans);
   margin: 0 0 v.$space-3;
   font-size: v.$text-sm;
   font-weight: v.$fw-bold;

@@ -7,7 +7,9 @@ import styles from './ResultsScreen.module.scss';
  *
  * Pure: a score ring + percentage label, then the stat breakdown via the reused
  * `Scoreboard`. The summary is computed by MainPlayer through the scoring-registry
- * (no scoring logic duplicated here). Emits Review-all / Retake intent.
+ * (no scoring logic duplicated here). Emits Retake intent (review now happens
+ * before submission, via the header's persistent Review button — see
+ * PlayerHeader/MainPlayer).
  */
 export interface ResultsScreenProps {
   summary: {
@@ -28,7 +30,6 @@ export interface ResultsScreenProps {
    * no Angular equivalent and is intentionally always shown.
    */
   summaryType?: string;
-  onReviewAll: () => void;
   /** Omit to hide the Retake CTA (Angular parity: `showReplay=false` once attempts are exhausted). */
   onRetake?: () => void;
   language?: string;
@@ -45,7 +46,6 @@ export function ResultsScreen({
   summary,
   timeTaken = null,
   summaryType,
-  onReviewAll,
   onRetake,
   language = 'en',
 }: ResultsScreenProps) {
@@ -77,16 +77,13 @@ export function ResultsScreen({
           </p>
         )}
 
-        <div className={styles.actions}>
-          <button type="button" className={styles.reviewBtn} onClick={onReviewAll}>
-            {t(language, 'REVIEW_ALL')}
-          </button>
-          {onRetake && (
+        {onRetake && (
+          <div className={styles.actions}>
             <button type="button" className={styles.retakeBtn} onClick={onRetake}>
               {t(language, 'RETAKE')}
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );

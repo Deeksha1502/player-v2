@@ -1,7 +1,7 @@
 @use '../../styles/variables' as v;
 
 .body {
-  font-family: v.$ff-question; // Noto Serif — editorial question stem (design)
+  font-family: var(--qp-font-sans);
   font-size: v.$text-base;
   line-height: v.$lh-normal;
   color: v.$g700;

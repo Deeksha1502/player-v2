@@ -73,7 +73,7 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   // Transient submit-confirmation dialog (spec §7.0); overlays the assessment shell.
   const [submitDialog, setSubmitDialog] = useState(false);
-  // Where Review opens to (set when entering review from results).
+  // Where Review opens to (reset on each entry from the header's Review button).
   const [reviewStartIndex, setReviewStartIndex] = useState(0);
   // Assessment-level countdown (owned by the shell, not Context). Null = no limit.
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
@@ -507,9 +507,15 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
 
   const handleCancelSubmit = () => setSubmitDialog(false);
 
-  const handleReviewAll = () => {
+  // Review Answers (header's persistent Review button, enabled on the last
+  // question) — editable review before the assessment is actually finalized.
+  // handleConfirmSubmit (wired as ReviewScreen's onSubmit) finalizes from
+  // there once the learner is done checking/changing answers. setSubmitDialog
+  // is a defensive no-op unless the confirm dialog also happens to be open.
+  const handleReviewBeforeSubmit = () => {
     // Angular parity (scoreboard.component.ts:57, eventName.scoreBoardReviewClicked).
     logInteraction('score_board_review_clicked');
+    setSubmitDialog(false);
     setReviewStartIndex(0);
     setStage('review');
   };
@@ -565,6 +571,9 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
   useEffect(() => {
     if (autoStartedRef.current || !skipStartPage) return;
     if (stage !== 'overview' || state.sections.length === 0) return;
+    // Attempts exhausted — fall back to the overview (with its disabled
+    // Start/Resume CTA) instead of auto-starting into another attempt.
+    if (maxAttempts != null && state.attemptNumber >= maxAttempts) return;
     autoStartedRef.current = true;
     setCurrentSection(0);
     setCurrentQuestion(0);
@@ -645,19 +654,23 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
         summary={summary}
         timeTaken={timeTaken}
         summaryType={overview.summaryType}
-        onReviewAll={handleReviewAll}
         onRetake={canRetake ? handleRetake : undefined}
         language={language}
       />
     );
   } else if (stage === 'review') {
+    // Only reachable pre-submit (from the header's Review button) —
+    // editable, exits back to the assessment, and finalizes via its own
+    // Submit action. There is no post-submit review anymore.
     content = (
       <ReviewScreen
         questions={allQuestions}
         sections={state.sections}
         answers={state.answers}
         startIndex={reviewStartIndex}
-        onExit={() => setStage('results')}
+        onExit={() => setStage('assessment')}
+        exitLabel={t(language, 'BACK_TO_ASSESSMENT')}
+        onSubmit={handleConfirmSubmit}
         language={language}
       />
     );
@@ -716,6 +729,8 @@ export function MainPlayer({ playerConfig, onPlayerEvent }: MainPlayerProps) {
           questionNumber={globalQuestionNumber}
           totalQuestions={overview.totalQuestions}
           onSubmit={handleSubmitAssessment}
+          onReview={handleReviewBeforeSubmit}
+          reviewAvailable={globalQuestionNumber === overview.totalQuestions}
           onMenuClick={() => setDrawerOpen(true)}
           onBrandClick={() => setStage('overview')}
           sectionLabel={sectionLabel}

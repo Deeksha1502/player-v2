@@ -71,6 +71,7 @@
 }
 
 .cardLabel {
+  font-family: var(--qp-font-sans);
   line-height: v.$lh-snug;
   pointer-events: none;
 
@@ -80,6 +81,7 @@
 }
 
 .review {
+  font-family: var(--qp-font-sans);
   padding: v.$space-3;
   background: v.$success-bg;
   border-inline-start: 3px solid v.$success;

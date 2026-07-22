@@ -129,6 +129,7 @@
 // navbar instead. Hidden outside m.compact; MainPlayer only passes this prop
 // during the section-intro stage anyway.
 .sectionLabel {
+  font-family: var(--qp-font-sans);
   display: none;
   min-width: 0;
   font-size: v.$text-sm;
@@ -176,6 +177,7 @@
 }
 
 .stepDot {
+  font-family: var(--qp-font-sans);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,12 +196,13 @@
 }
 
 .completed .stepDot {
-  background: v.$success-bg;
-  color: v.$success;
+  background: var(--qp-primary-subtle);
+  color: var(--qp-primary);
 }
 
 // ── Right cluster ────────────────────────────────────────────────────────────
 .timer {
+  font-family: var(--qp-font-sans);
   display: inline-flex;
   align-items: center;
   gap: v.$space-2;
@@ -232,6 +235,7 @@
 }
 
 .help {
+  font-family: var(--qp-font-sans);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -275,6 +279,7 @@
 }
 
 .legendTitle {
+  font-family: var(--qp-font-sans);
   margin: 0;
   font-size: v.$text-xs;
   font-weight: v.$fw-bold;
@@ -292,6 +297,7 @@
 }
 
 .legendDot {
+  font-family: var(--qp-font-sans);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -310,17 +316,58 @@
   }
 
   &.completed {
-    background: v.$success-bg;
-    color: v.$success;
+    background: var(--qp-primary-subtle);
+    color: var(--qp-primary);
+  }
+}
+
+// Answered/unanswered marks (●/○) — matches Sidebar's .answered/.remaining dots.
+.legendMark {
+  font-family: var(--qp-font-sans);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: v.$text-sm;
+  font-weight: v.$fw-bold;
+
+  &.answered {
+    color: var(--qp-primary);
+  }
+
+  &.unanswered {
+    color: v.$gray-400;
   }
 }
 
 .counter {
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;
   color: v.$g700;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.reviewBtn {
+  @include m.button-base;
+  @include m.focus-ring;
+
+  flex-shrink: 0;
+  background: transparent;
+  color: v.$g700;
+  border: 1.5px solid v.$gray-300;
+
+  &:hover:not(:disabled) {
+    border-color: v.$g400;
+    background: v.$cream-bg;
+  }
+
+  @include m.mobile {
+    padding: v.$space-2 v.$space-3;
+  }
 }
 
 .submitBtn {

@@ -28,8 +28,8 @@ import styles from './StartPage.module.scss';
  * local UI state in this component; it never reaches Context or the parent.
  */
 
-/** Letter-badge palette for the first sections (later sections render without a badge). */
-const BADGE_COLORS = ['#a85236', '#cc8545', '#c2703c', '#5f8268'];
+/** Section cards only show a letter badge for the first few sections. */
+const MAX_BADGED_SECTIONS = 4;
 
 export interface StartPageProps {
   title: string;
@@ -82,6 +82,9 @@ export function StartPage({
   // Not sent by the backend → "No Limit" rather than hiding the tile or
   // showing a fabricated number.
   const attemptsDisplay = attemptsLeft == null ? t(language, 'NO_LIMIT') : String(attemptsLeft);
+  // Exhausted only when the backend sent an explicit cap (0 attempts left) —
+  // never when unlimited (null). Gates the Start/Resume CTA below.
+  const attemptsExhausted = attemptsLeft === 0;
 
   const stats = [
     { key: 'q', icon: <ClipboardIcon size={20} />, label: t(language, 'QUESTIONS'), value: String(totalQuestions) },
@@ -153,27 +156,29 @@ export function StartPage({
               {sections.map((section, i) => {
                 const blurb = readI18n(section.description, language);
                 const name = readI18n(section.name, language);
-                const Tag = onSectionSelect ? 'button' : 'div';
+                // Section cards jump straight into the assessment (bypassing
+                // Start/Resume), so they must be disabled too once attempts
+                // are exhausted — otherwise they're a second way in.
+                const sectionSelectable = onSectionSelect && !attemptsExhausted;
+                const Tag = sectionSelectable ? 'button' : 'div';
                 return (
                   <Tag
                     key={section.identifier}
                     className={styles.sectionCard}
-                    {...(onSectionSelect
+                    {...(sectionSelectable
                       ? { type: 'button' as const, onClick: () => onSectionSelect(i) }
                       : {})}
                   >
                     <div className={styles.cardTop}>
-                      {i < BADGE_COLORS.length && (
-                        <span
-                          className={styles.badge}
-                          style={{ background: BADGE_COLORS[i] }}
-                          aria-hidden="true"
-                        >
+                      {i < MAX_BADGED_SECTIONS && (
+                        <span className={styles.badge} aria-hidden="true">
                           {String.fromCharCode(65 + i)}
                         </span>
                       )}
                       <span className={styles.cardName}>{name}</span>
-                      <ChevronRightIcon size={18} className={styles.cardChevron} />
+                      {sectionSelectable && (
+                        <ChevronRightIcon size={18} className={styles.cardChevron} />
+                      )}
                     </div>
                     <span className={styles.cardCount}>{questionLabel(section.children.length)}</span>
                     {blurb && <span className={styles.cardBlurb}>{blurb}</span>}
@@ -182,13 +187,20 @@ export function StartPage({
               })}
             </div>
 
-            <button type="button" className={styles.startBtn} onClick={onStart}>
+            <button
+              type="button"
+              className={styles.startBtn}
+              onClick={onStart}
+              disabled={attemptsExhausted}
+            >
               {t(language, hasStarted ? 'RESUME_ASSESSMENT' : 'START_ASSESSMENT')} <span aria-hidden="true">→</span>
             </button>
 
             <p className={styles.footerNote}>
               <ShieldIcon size={16} className={styles.footerIcon} />
-              {t(language, hasStarted ? 'TIMER_RESUME_NOTE' : 'TIMER_START_NOTE', { attempts: attemptsDisplay })}
+              {attemptsExhausted
+                ? t(language, 'MAX_ATTEMPTS_REACHED')
+                : t(language, hasStarted ? 'TIMER_RESUME_NOTE' : 'TIMER_START_NOTE', { attempts: attemptsDisplay })}
             </p>
           </div>
         )}

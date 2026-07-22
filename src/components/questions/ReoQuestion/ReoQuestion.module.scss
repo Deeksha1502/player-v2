@@ -8,6 +8,7 @@
 }
 
 .sectionLabel {
+  font-family: var(--qp-font-sans);
   margin: v.$space-3 0 v.$space-2;
   font-size: v.$text-xs;
   font-weight: v.$fw-bold;
@@ -40,6 +41,7 @@
 }
 
 .placeholder {
+  font-family: var(--qp-font-sans);
   align-self: center;
   font-style: italic;
   color: v.$g400;
@@ -113,6 +115,7 @@
 }
 
 .allUsed {
+  font-family: var(--qp-font-sans);
   font-size: v.$text-sm;
   font-weight: v.$fw-semibold;
   color: v.$success;

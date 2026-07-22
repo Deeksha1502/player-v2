@@ -95,6 +95,7 @@ export const translations: Record<string, string> = {
   START_ASSESSMENT: 'Start assessment',
   RESUME_ASSESSMENT: 'Resume assessment',
   ATTEMPTS_LEFT: 'Attempts Left',
+  MAX_ATTEMPTS_REACHED: 'You have used all your attempts for this assessment.',
   MINUTES_LABEL: 'Minutes',
   NO_LIMIT: 'No Limit',
   TIMER_START_NOTE: 'The timer starts when you click. You have {attempts} attempts for this assessment.',
@@ -107,14 +108,15 @@ export const translations: Record<string, string> = {
 
   // Results & Review (Phase 7)
   SUBMIT_TITLE: 'Submit your assessment?',
-  SUBMIT_BODY: 'You can review your answers after submitting.',
+  SUBMIT_BODY: 'You can review your answers while submitting.',
   CONFIRM: 'Confirm',
   CANCEL: 'Cancel',
   YOUR_RESULTS: 'Your Results',
-  REVIEW_ALL: 'Review all answers',
   RETAKE: 'Retake',
   REVIEW: 'Review',
+  REVIEW_AVAILABLE_AT_END: 'Review your answers once you reach the last question',
   BACK_TO_RESULTS: 'Back to results',
+  BACK_TO_ASSESSMENT: 'Back to assessment',
   RESULT_SUMMARY: 'You scored {score} out of {max}.',
   ANSWER: 'Answer',
 

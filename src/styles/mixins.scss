@@ -26,6 +26,23 @@
   }
 }
 
+// Very narrow phones — below this, a fixed 2-up split (e.g. MCQ grid/horizontal
+// option layout) leaves too little room per column and forces mid-word breaks,
+// so those layouts fall back to a single full-width column instead.
+@mixin mobile-xs {
+  @container quml (max-width: #{v.$bp-mobile-xs}) {
+    @content;
+  }
+}
+
+// Narrowest supported phones — for layouts (e.g. SEQ horizontal) that can stay
+// row-based down to a smaller width than mobile-xs before falling back.
+@mixin mobile-2xs {
+  @container quml (max-width: #{v.$bp-mobile-2xs}) {
+    @content;
+  }
+}
+
 // Respond at tablet and below (≤1023px). Combine with `mobile` (which is more
 // specific / placed after) for progressive collapse: tablet 2-up → mobile 1-up.
 @mixin tablet {
